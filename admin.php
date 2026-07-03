@@ -5,7 +5,8 @@ $cfg = app_boot();
 header('Content-Type: text/html; charset=utf-8');           // écrase le JSON de app_boot()
 header('X-Robots-Tag: noindex, nofollow');
 
-if (auth_current($cfg)) {                                     // session admin valide → console
+$auth = auth_current($cfg);
+if ($auth && $auth['role'] === 'admin') {                     // session ADMIN valide uniquement → console
   readfile(__DIR__.'/admin.html');
   exit;
 }
