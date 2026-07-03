@@ -7,7 +7,7 @@ require_role('admin', $cfg);
 
 $in = read_body();
 $data = $in['data'] ?? null;
-if (!is_array($data) || !isset($data['jak']) || !isset($data['settings'])) {
+if (!is_array($data) || !isset($data['jak']) || !is_array($data['jak']) || !isset($data['settings']) || !is_array($data['settings'])) {
   json_out(['success'=>false,'message'=>'Données invalides'], 422);
 }
 store_save($cfg, $data);
