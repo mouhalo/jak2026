@@ -31,5 +31,10 @@ eq($data['jak'][0]['telephone'], '770000009', 'téléphone mis à jour');
 eq($data['jak'][0]['id'], 'm-a', 'id inchangé');
 ok(member_apply_update($data,'inconnu',[])===false, 'update id inconnu = false');
 
+$js = file_get_contents($cfg['datajs_path']);
+ok(strpos($js,'770000001')===false && strpos($js,'m-a')===false, 'data.js public ne contient ni telephone ni id');
+$jsonRaw = file_get_contents($cfg['data_path']);
+ok(strpos($jsonRaw,'770000001')!==false && strpos($jsonRaw,'m-a')!==false, 'data.json canonique contient bien telephone et id');
+
 @unlink($cfg['data_path']); @unlink($cfg['datajs_path']);
 done();

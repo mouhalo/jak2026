@@ -25,7 +25,8 @@ function respond_then_continue(array $payload, int $status = 200): void {
 
 if ($role === 'admin') {
   $phone = $cfg['admin_phone'];
-  $th = throttle_check_and_touch($phone, $now, $cfg);
+  $thCfg = $cfg; $thCfg['otp_per_number_daily'] = $cfg['otp_admin_daily'] ?? 50;
+  $th = throttle_check_and_touch($phone, $now, $thCfg);
   if (!$th['allowed']) json_out(['success'=>false,'message'=>'Veuillez patienter avant un nouvel envoi.','cooldown'=>$cfg['otp_resend']], 429);
   $code = otp_generate();
   otp_set_challenge($sess, 'admin', null, $phone, $code, $now, $cfg);
@@ -47,13 +48,11 @@ if (!$th['allowed']) {
 }
 $data = store_load($cfg);
 $m = member_find_by_phone($data, $phone9);
-$code = null;
-if ($m) {
-  $code = otp_generate();
-  otp_set_challenge($sess, 'membre', $m['id'], $phone9, $code, $now, $cfg);
-  $_SESSION['otp'] = $sess;
-}
-// Réponse émise AVANT l'envoi réseau : le temps de réponse ne dépend pas de $m.
+$code = otp_generate();
+// Challenge posé MÊME sans membre (leurre non envoyé) : verify-otp se comporte
+// à l'identique (jamais 'none' pour un inconnu) → pas d'oracle d'énumération au verify.
+otp_set_challenge($sess, 'membre', $m['id'] ?? null, $phone9, $code, $now, $cfg);
+$_SESSION['otp'] = $sess;
 respond_then_continue(['success'=>true,'message'=>$GENERIC,'cooldown'=>$cfg['otp_resend']]);
 if ($m) {
   $res = wa_send_otp($phone9, $code, $cfg);
