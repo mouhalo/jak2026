@@ -57,7 +57,7 @@ $remotePrefix = if ($remote) { "$remote/" } else { '' }
 
 # --- Fichiers à NE PAS déployer ---
 # Tous les *.md (docs internes : CLAUDE, RAPPORT, CONCEPT, AUDIT_SEO…) sont exclus.
-$excludeNames = @('.env', 'deploy.ps1', '.gitignore', 'data.json')
+$excludeNames = @('.env', 'deploy.ps1', 'deploy_lite.ps1', '.gitignore', 'data.json', '.deploy-manifest.json')
 $excludeDirs  = @('.git', 'node_modules', '.vscode', '.idea', 'state', '.superpowers', 'docs', 'tests', 'tools')
 
 $files = Get-ChildItem -Path $root -Recurse -File | Where-Object {
