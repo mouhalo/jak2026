@@ -14,5 +14,9 @@ api/lib/config.php
 data.json
 api/state/
 
+# Base de données — artefacts de seed générés (régénérables via node db/seed.mjs)
+db/seed.sql
+souvenirs/*/seed/
+
 # Scratch subagent-driven-dev (briefs, rapports, ledger — contient des secrets)
 .superpowers/
