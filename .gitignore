@@ -20,3 +20,6 @@ souvenirs/*/seed/
 
 # Scratch subagent-driven-dev (briefs, rapports, ledger — contient des secrets)
 .superpowers/
+
+# Manifeste de déploiement incrémental (état local, régénérable)
+.deploy-manifest.json
