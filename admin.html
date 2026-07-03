@@ -165,6 +165,10 @@ function renderGal(){
 }
 function renderAll(){renderReglages();renderCheikh();renderDign();renderJak();renderGal();}
 renderAll();
+/* charge les données canoniques (avec id/telephone) pour l'édition admin */
+fetch('api/admin/get-data.php').then(r=>r.json()).then(res=>{
+  if(res&&res.success&&res.data&&res.data.jak){ D=res.data; renderAll(); }
+}).catch(()=>{});
 
 /* ---- events (délégation) ---- */
 document.body.addEventListener('input',e=>{

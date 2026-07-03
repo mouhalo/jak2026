@@ -9,7 +9,13 @@ function store_load(array $cfg): array {
 function store_save(array $cfg, array $data): void {
   $json = json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
   _atomic_write($cfg['data_path'], $json);
-  $js = 'window.SITE_DATA='.json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).";\n";
+  // data.js PUBLIC = projection sans champs privés (telephone/id des membres)
+  $public = $data;
+  if (isset($public['jak']) && is_array($public['jak'])) {
+    foreach ($public['jak'] as &$m) { if (is_array($m)) { unset($m['telephone'], $m['id']); } }
+    unset($m);
+  }
+  $js = 'window.SITE_DATA='.json_encode($public, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).";\n";
   _atomic_write($cfg['datajs_path'], $js);
 }
 
