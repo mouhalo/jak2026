@@ -19,7 +19,7 @@ function throttle_check_and_touch(string $phone9, int $now, array $cfg): array {
   $global = $cfg['otp_global_daily'] ?? 200;
 
   $fp = @fopen($path, 'c+');
-  if ($fp === false) return ['allowed'=>true, 'reason'=>'nostore']; // fail-open borné par le quota service (250/j)
+  if ($fp === false) { error_log('[jak-otp] throttle store indisponible (fail-open): '.$path); return ['allowed'=>true, 'reason'=>'nostore']; } // fail-open borné par le quota service (250/j)
   flock($fp, LOCK_EX);
   $raw  = stream_get_contents($fp);
   $data = json_decode((string)$raw, true); if (!is_array($data)) $data = [];
