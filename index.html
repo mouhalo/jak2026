@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visite de Cheikh Ould Khaiïry — 2026</title>
+<meta name="description" content="Visite de Cheikh Ould Khaiïry à Dakar les 16, 17 et 18 juillet 2026 au CICES. Programme, accès et informations — organisé par Jeunesse Al Khaïry.">
+<link rel="canonical" href="https://jak.sn/">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jeunesse Al Khaïry">
+<meta property="og:title" content="Visite de Cheikh Ould Khaiïry — 16·17·18 Juillet 2026, CICES Dakar">
+<meta property="og:description" content="Programme, accès et informations sur la visite du Cheikh. Organisé par Jeunesse Al Khaïry.">
+<meta property="og:url" content="https://jak.sn/">
+<meta property="og:image" content="https://jak.sn/image_cheikh.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Visite de Cheikh Ould Khaiïry — Juillet 2026">
+<meta name="twitter:description" content="16·17·18 juillet 2026 au CICES, Dakar. Organisé par Jeunesse Al Khaïry.">
+<meta name="twitter:image" content="https://jak.sn/image_cheikh.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "Visite de Cheikh Ould Khaiïry",
+  "startDate": "2026-07-16T09:00:00+00:00",
+  "endDate": "2026-07-18T22:00:00+00:00",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "location": {
+    "@type": "Place",
+    "name": "CICES",
+    "address": { "@type": "PostalAddress", "addressLocality": "Dakar", "addressCountry": "SN" }
+  },
+  "image": ["https://jak.sn/image_cheikh.png"],
+  "organizer": { "@type": "Organization", "name": "Jeunesse Al Khaïry", "url": "https://jak.sn" }
+}
+</script>
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="site.js"></script>
+</head>
+<body>
+<main>
+  <header class="hero wrap">
+    <img class="portrait" id="chPhoto" src="" width="482" height="495" alt="Cheikh Ould Khaiïry" onerror="this.style.display='none'">
+    <p class="eyebrow" id="chEyebrow"></p>
+    <h1 id="chNom">Cheikh Ould Khaiïry</h1>
+    <div class="dates" id="chDates"></div>
+    <div class="lieu" id="chLieu"></div>
+    <div class="count" id="countdown"></div>
+    <p style="margin-top:18px">
+      <a class="cta" href="Mon_Acces_2026.html" id="ctaVenue"></a>
+    </p>
+  </header>
+
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secBio"></h2>
+    <div class="panel"><p id="chBio"></p>
+      <p class="muted" style="font-family:'IBM Plex Mono',monospace;font-size:12px" id="chAdr"></p>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secCit"></h2>
+    <div id="chCitations"></div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secProg"></h2>
+    <div class="prog" id="progGrid"></div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secGal"></h2>
+    <div id="galCaro"></div>
+    <p style="text-align:center;margin-top:16px"><a class="cta ghost" href="galerie.html" id="ctaGal"></a></p>
+  </div></section>
+
+  <div id="soutienMount"></div>
+</main>
+<script>
+(function(){
+  const D=window.SITE_DATA,S=D.settings,C=D.cheikh;
+  renderChrome('accueil');
+  document.getElementById('chPhoto').src=C.photo||'';
+  document.getElementById('chEyebrow').textContent=S.organisateur+' · '+S.lieu;
+  document.getElementById('chNom').textContent=C.nom_complet;
+  document.getElementById('chDates').textContent=S.dates_texte;
+  document.getElementById('chLieu').textContent=S.lieu;
+  document.getElementById('ctaVenue').textContent='📍 '+T('cta_venue');
+  document.getElementById('secBio').textContent=T('bio');
+  document.getElementById('chBio').innerHTML=todoWrap(C.biographie);
+  document.getElementById('chAdr').innerHTML='📍 '+T('adresse')+' : '+todoWrap(C.adresse);
+  document.getElementById('secCit').textContent=T('citations');
+  document.getElementById('chCitations').innerHTML=(C.citations||[])
+    .map(c=>`<blockquote>« ${todoWrap(c)} »</blockquote>`).join('')||'<p class="muted">—</p>';
+  document.getElementById('secProg').textContent=T('programme');
+  document.getElementById('progGrid').innerHTML=(S.programme||[]).map(p=>
+    `<div class="day"><div class="d">${esc(p.jour)}</div><h3>${todoWrap(p.titre)}</h3><p>${todoWrap(p.desc)}</p></div>`).join('');
+  document.getElementById('secGal').textContent=T('galerie');
+  initCarousel(document.getElementById('galCaro'),(D.galerie||[]).filter(g=>g.src).slice(0,12),{delay:3600});
+  document.getElementById('soutienMount').outerHTML=soutienBlock();
+  document.getElementById('ctaGal').textContent='🖼 '+T('nav_galerie');
+  startCountdown('countdown');
+})();
+</script>
+</body>
+</html>
