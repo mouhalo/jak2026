@@ -47,6 +47,7 @@
   <h1>⚙️ Administration du site</h1>
   <span class="saved" id="savedMsg"></span>
   <button class="abtn" id="btnDraft">💾 Enregistrer le brouillon</button>
+  <button id="saveOnline" class="abtn gold">☁ Enregistrer en ligne</button>
   <button class="abtn gold" id="btnExport">⬇ Exporter data.js</button>
   <button class="abtn red" id="btnReset">Réinitialiser</button>
 </div>
@@ -142,6 +143,8 @@ function personForm(base,i,p,isJak){
     ${fld("Adresse",base+"."+i+".adresse")}
     ${isJak?fld("Fonction",base+"."+i+".fonction"):''}
     ${isJak?fld("Fondateur",base+"."+i+".fondateur","select",["OUI","NON"]):''}
+    ${isJak?fld("Identifiant (id, unique)",base+"."+i+".id"):''}
+    ${isJak?fld("Téléphone (9 chiffres)",base+"."+i+".telephone"):''}
     </div>
     ${fld("Biographie",base+"."+i+".biographie","textarea")}</div>`;
 }
@@ -221,6 +224,10 @@ $('#btnExport').addEventListener('click',()=>{
   a.href=URL.createObjectURL(blob);a.download='data.js';a.click();
   try{localStorage.setItem('admin_draft',JSON.stringify(D));}catch(e){}
   msg('data.js téléchargé — remplacez le fichier du site');
+});
+$('#saveOnline').addEventListener('click',async ()=>{
+  const r=await fetch('api/admin/save-data.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:D})}).then(r=>r.json()).catch(()=>({success:false}));
+  msg(r.success?'Enregistré en ligne ✓ — le site public est à jour':'Échec de l’enregistrement en ligne');
 });
 $('#btnReset').addEventListener('click',()=>{
   if(!confirm('Abandonner le brouillon et revenir au contenu du fichier data.js actuel ?'))return;
