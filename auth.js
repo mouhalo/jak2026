@@ -59,7 +59,10 @@
     let photoData=m.photo||'';
     $('#ePhotoFile').addEventListener('change',e=>{
       const f=e.target.files[0]; if(!f)return;
-      compress(f,700,0.85,d=>{photoData=d;$('#ePhotoPrev').src=d;});
+      $('#eMsg').textContent='Traitement de la photo…';
+      compress(f,700,0.82,
+        d=>{photoData=d;$('#ePhotoPrev').src=d;$('#eMsg').textContent='Photo prête ('+Math.round(d.length/1024)+' Ko)';},
+        err=>{$('#eMsg').textContent=err;});
     });
     $('#eSave').addEventListener('click',async ()=>{
       const body={photo:photoData,nom_complet:$('#eNom').value,adresse:$('#eAdr').value,
@@ -70,14 +73,35 @@
     $('#eOut').addEventListener('click',async ()=>{await api('api/auth/logout.php');o.remove();});
   }
 
-  // Compression photo (reprise de la logique canvas d'admin.html)
-  function compress(file,max,q,cb){
-    const img=new Image(); const rd=new FileReader();
-    rd.onload=()=>{img.onload=()=>{
-      let w=img.width,h=img.height; if(w>h&&w>max){h=h*max/w;w=max;} else if(h>max){w=w*max/h;h=max;}
-      const c=document.createElement('canvas');c.width=w;c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',q));
-    };img.src=rd.result;};
+  // Compression photo robuste + adaptative : gère les erreurs de décodage
+  // (ex. HEIC), redimensionne à `max` px, puis baisse qualité/dimensions
+  // jusqu'à passer sous la limite serveur (~1,5 Mo base64, marge sous 2 Mo).
+  function compress(file,max,q,onOk,onErr){
+    onErr=onErr||function(){};
+    const LIMIT=1500000;
+    const rd=new FileReader();
+    rd.onerror=()=>onErr('Lecture du fichier impossible.');
+    rd.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>onErr('Format d’image non pris en charge (essayez un JPEG ou PNG, pas un HEIC).');
+      img.onload=()=>{
+        try{
+          const draw=(scale,quality)=>{
+            const w=Math.max(1,Math.round(img.width*scale)), h=Math.max(1,Math.round(img.height*scale));
+            const c=document.createElement('canvas'); c.width=w; c.height=h;
+            c.getContext('2d').drawImage(img,0,0,w,h);
+            return c.toDataURL('image/jpeg',quality);
+          };
+          let scale=Math.min(1, max/Math.max(img.width,img.height));
+          let quality=q, out=draw(scale,quality);
+          while(out.length>LIMIT && quality>0.4){ quality-=0.1; out=draw(scale,quality); }
+          while(out.length>LIMIT && scale>0.25){ scale*=0.8; out=draw(scale,0.7); }
+          if(out.length>LIMIT){ onErr('Photo trop lourde même après compression — choisissez une image plus petite.'); return; }
+          onOk(out);
+        }catch(err){ onErr('Traitement de l’image impossible sur cet appareil.'); }
+      };
+      img.src=rd.result;
+    };
     rd.readAsDataURL(file);
   }
 
