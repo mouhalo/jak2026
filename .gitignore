@@ -12,6 +12,7 @@ Desktop.ini
 # Auth OTP — secrets & état serveur
 api/lib/config.php
 data.json
+api/state/
 
 # Scratch subagent-driven-dev (briefs, rapports, ledger — contient des secrets)
 .superpowers/
