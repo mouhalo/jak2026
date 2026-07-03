@@ -1,0 +1,10 @@
+# Secrets — ne jamais committer
+.env
+
+# Système / éditeurs
+node_modules/
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store

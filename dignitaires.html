@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dignitaires — Visite de Cheikh Ould Khaiïry 2026</title>
+<meta name="description" content="Les dignitaires des dahira qui accompagnent la visite de Cheikh Ould Khaiïry au CICES de Dakar (16-17-18 juillet 2026) et le protocole d'accueil.">
+<link rel="canonical" href="https://jak.sn/dignitaires.html">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jeunesse Al Khaïry">
+<meta property="og:title" content="Dignitaires — Visite de Cheikh Ould Khaiïry 2026">
+<meta property="og:description" content="Les dignitaires des dahira accompagnant la visite du Cheikh et le protocole d'accueil au CICES.">
+<meta property="og:url" content="https://jak.sn/dignitaires.html">
+<meta property="og:image" content="https://jak.sn/image_cheikh.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jak.sn/image_cheikh.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="site.js"></script>
+</head>
+<body>
+<main>
+  <header class="hero wrap" style="padding-bottom:16px">
+    <p class="eyebrow" id="pgEyebrow"></p>
+    <h1 id="pgTitre">Dignitaires</h1>
+    <p class="lieu" id="pgIntro" style="max-width:64ch;margin:10px auto 0;line-height:1.6"></p>
+  </header>
+  <div id="grpCaro" style="margin-top:6px"></div>
+  <section><div class="wrap">
+    <div class="cards" id="dignGrid"></div>
+  </div></section>
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secProto"></h2>
+    <div class="panel"><p id="protoTxt"></p>
+      <p style="margin-top:10px"><a class="cta ghost" href="Mon_Acces_2026.html" id="ctaAcces"></a></p>
+    </div>
+  </div></section>
+</main>
+<script>
+(function(){
+  const D=window.SITE_DATA;
+  renderChrome('dign');
+  document.getElementById('pgEyebrow').textContent=D.settings.event_nom+' · '+D.settings.dates_texte;
+  document.getElementById('pgTitre').textContent=T('nav_dign');
+  document.getElementById('pgIntro').textContent=T('dign_intro');
+  document.getElementById('dignGrid').innerHTML=(D.dignitaires||[]).map(p=>personCard(p)).join('')
+    ||'<p class="muted">—</p>';
+  initCarousel(document.getElementById('grpCaro'),
+    (D.dignitaires||[]).filter(p=>p.photo).map(p=>({src:p.photo,legende:p.nom_complet,bio:p.biographie,adresse:p.adresse})),{delay:3600});
+  document.getElementById('secProto').textContent=T('protocole');
+  document.getElementById('protoTxt').textContent=T('protocole_txt');
+  document.getElementById('ctaAcces').textContent='📍 '+T('cta_venue');
+})();
+</script>
+</body>
+</html>

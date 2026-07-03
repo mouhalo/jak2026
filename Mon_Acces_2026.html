@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon accès — Visite du Cheikh 2026</title>
+<meta name="description" content="Préparez votre venue : plan d'accès au CICES, entrées par carte, protocole et consignes pour la visite de Cheikh Ould Khaiïry (16-18 juillet 2026).">
+<link rel="canonical" href="https://jak.sn/Mon_Acces_2026.html">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jeunesse Al Khaïry">
+<meta property="og:title" content="Mon accès — Visite du Cheikh 2026">
+<meta property="og:description" content="Plan d'accès au CICES, entrées par carte et consignes pour la visite du Cheikh.">
+<meta property="og:url" content="https://jak.sn/Mon_Acces_2026.html">
+<meta property="og:image" content="https://jak.sn/image_cheikh.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jak.sn/image_cheikh.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --bg:#0d1b16; --panel:#142a22; --panel-2:#183227; --line:#2b463b;
+    --ink:#ede6d6; --muted:#9db3a6; --gold:#d4a83a; --green:#3fa06e;
+    --orange:#e0913c; --blue:#5a92cf; --red:#d0463d; --grey:#8d9c94;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(900px 500px at 50% -10%, #17342a 0%, transparent 60%),var(--bg);
+    min-height:100vh;padding:18px 14px 40px;
+  }
+  .wrap{max-width:640px;margin:0 auto}
+
+  /* ===== SPLASH ===== */
+  #splash{
+    position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;padding:30px 24px;text-align:center;
+    background:radial-gradient(900px 500px at 50% -10%, #17342a 0%, transparent 60%),var(--bg);
+    transition:opacity .7s;cursor:pointer;
+  }
+  #splash.hide{opacity:0;pointer-events:none}
+  #splash img{
+    width:min(60vw,270px);border-radius:20px;border:2px solid var(--gold);
+    box-shadow:0 24px 70px -22px rgba(212,168,58,.55);
+    animation:splashIn 1s cubic-bezier(.2,.8,.3,1);
+  }
+  #splash .s-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--gold);animation:fadeUp 1s .25s both}
+  #splash .s-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:clamp(26px,7.5vw,40px);line-height:1.02;animation:fadeUp 1s .4s both}
+  #splash .s-sub{color:var(--muted);font-size:13.5px;animation:fadeUp 1s .55s both}
+  #splash .s-skip{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);opacity:.7;margin-top:12px;animation:fadeUp 1s 1.2s both}
+  @keyframes splashIn{from{transform:scale(.9);opacity:0}}
+  @keyframes fadeUp{from{transform:translateY(10px);opacity:0}}
+
+  /* ===== MODAL LANGUES ===== */
+  #langModal{
+    position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    background:rgba(6,14,11,.82);backdrop-filter:blur(5px);padding:20px;
+  }
+  #langModal.on{display:flex}
+  .lmbox{
+    background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    max-width:400px;width:100%;padding:24px 22px;animation:splashIn .45s cubic-bezier(.2,.8,.3,1);
+  }
+  .lmbox h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:24px;letter-spacing:.03em;margin:0 0 4px;text-align:center}
+  .lmbox .lm-sub{color:var(--muted);font-size:12px;text-align:center;margin:0 0 16px;
+    font-family:'IBM Plex Mono',monospace;letter-spacing:.04em}
+  .langbtn{
+    display:flex;align-items:center;gap:12px;width:100%;cursor:pointer;text-align:left;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:13px 15px;margin-bottom:9px;color:var(--ink);transition:border-color .15s,transform .1s;
+  }
+  .langbtn:active{transform:scale(.97)}
+  .langbtn:hover{border-color:#3c6a52}
+  .langbtn .code{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;color:#1a1408;
+    background:var(--gold);border-radius:8px;padding:6px 8px;letter-spacing:.05em;flex:0 0 auto;
+  }
+  .langbtn .nm{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;
+    text-transform:uppercase;letter-spacing:.03em;line-height:1}
+  .langbtn .hi{display:block;font-family:'Inter',sans-serif;font-weight:400;font-size:11.5px;
+    color:var(--muted);text-transform:none;letter-spacing:0;margin-top:2px}
+
+  /* bouton langue flottant */
+  #btnLang{
+    position:fixed;top:12px;inset-inline-end:12px;z-index:30;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;
+    color:var(--ink);padding:8px 12px;
+  }
+
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--gold);margin:0 0 6px;text-align:center}
+  h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:clamp(26px,7vw,38px);line-height:1;margin:0 0 6px;text-align:center}
+  .lede{color:var(--muted);font-size:14px;line-height:1.5;text-align:center;margin:0 0 20px}
+
+  /* ===== écran 1 : sélection ===== */
+  #pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pickbtn{
+    position:relative;border:1px solid var(--line);border-radius:14px;cursor:pointer;
+    background:var(--panel);color:var(--ink);padding:14px 12px 12px;text-align:left;
+    min-height:86px;overflow:hidden;transition:transform .1s, border-color .15s;
+  }
+  .pickbtn:active{transform:scale(.97)}
+  .pickbtn .band{position:absolute;left:0;top:0;bottom:0;width:7px}
+  .pickbtn h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:19px;letter-spacing:.02em;margin:0 0 3px;padding-left:8px}
+  .pickbtn p{margin:0;padding-left:8px;font-size:11.5px;color:var(--muted);line-height:1.35}
+  .pickbtn.pub{grid-column:1 / -1;min-height:70px}
+
+  /* ===== écran 2 : parcours ===== */
+  #route{display:none}
+  .mycard{
+    display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;margin-bottom:12px;
+    background:var(--cardbg,var(--panel));color:var(--cardink,var(--ink));
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .mycard .ic{width:34px;height:34px;flex:0 0 auto}
+  .mycard .ic svg{width:100%;height:100%;fill:currentColor}
+  .mycard .t1{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:21px;line-height:1}
+  .mycard .t2{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;opacity:.8;margin-top:2px}
+  .mycard .chg{margin-inline-start:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+    background:rgba(0,0,0,.25);color:inherit;border:1px solid rgba(255,255,255,.25);
+    border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;text-align:center}
+
+  .svg-wrap{background:#0a1611;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  svg{display:block;width:100%;height:auto}
+
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .btn{flex:1;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;
+    font-weight:600;font-size:16px;cursor:pointer;color:var(--ink);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+  .btn.primary{background:var(--gold);color:#1a1408;border-color:var(--gold)}
+
+  .steps{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .step{
+    display:flex;gap:11px;align-items:flex-start;background:var(--panel);
+    border:1px solid var(--line);border-radius:11px;padding:10px 12px;opacity:.42;transition:.3s;
+  }
+  .step .n{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  .step .tx{font-size:13.5px;line-height:1.45}
+  .step .tx b{color:var(--gold)}
+  .step.on{opacity:1;border-color:#3c6a52}
+  .step.on .n{background:var(--gold);color:#1a1408;border-color:var(--gold);font-weight:600}
+  .step.done{opacity:.8}
+  .step.done .n{background:var(--green);border-color:var(--green);color:#08160f}
+  .step.done .n::before{content:"✓"}
+  .step.done .n span{display:none}
+
+  .arrived{
+    display:none;margin-top:12px;text-align:center;font-family:'Barlow Condensed',sans-serif;
+    text-transform:uppercase;letter-spacing:.05em;font-size:19px;color:var(--green);
+    background:rgba(63,160,110,.1);border:1px solid rgba(63,160,110,.4);border-radius:11px;padding:11px}
+  .arrived.on{display:block}
+
+  .consignes{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .consignes h4{margin:0 0 7px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;
+    font-size:15px;letter-spacing:.05em;color:var(--gold)}
+  .consignes ul{margin:0;padding-left:17px}
+  .consignes li{font-size:12.5px;color:var(--ink);line-height:1.55;margin-bottom:4px}
+
+  .foot{color:var(--muted);font-size:11px;margin-top:22px;font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.03em;text-align:center;line-height:1.6}
+
+  /* SVG plan */
+  .zlabel{font-family:'IBM Plex Mono',monospace;font-size:12px;fill:var(--muted);letter-spacing:.05em}
+  .platform{fill:#1c2f27;stroke:#37564a;stroke-width:1.5}
+  .seat{fill:#24413a;stroke:#3c5e52;stroke-width:1}
+  .throne{fill:var(--gold);stroke:#f0d484;stroke-width:2}
+  .cordon{stroke:var(--red);stroke-width:2.4;stroke-dasharray:9 7;opacity:.85}
+  .gate rect{fill:#1c2f27;stroke:var(--gold);stroke-width:1.5}
+  .gate text{font-family:'IBM Plex Mono',monospace;font-size:11px;fill:var(--ink)}
+  .checkpt{fill:var(--gold)}
+  .zone-fill{opacity:.14}
+  .zone-stroke{fill:none;stroke-width:1.4;stroke-dasharray:2 4;opacity:.6}
+  .corridor{fill:#3fa06e;opacity:.10;stroke:#3fa06e;stroke-opacity:.4;stroke-width:1.2;stroke-dasharray:3 4}
+
+  #routeLine{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+  #routeGhost{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.18}
+  #gateMark .ring,#zoneMark .ring{fill:none;stroke-width:2.5;
+    transform-box:fill-box;transform-origin:center;animation:ring 1.6s ease-out infinite}
+  @keyframes ring{0%{transform:scale(.4);opacity:1}100%{transform:scale(2.4);opacity:0}}
+  #avatar text{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;fill:#fff;
+    paint-order:stroke;stroke:#0a1611;stroke-width:3px}
+  #zoneHalo{opacity:0;transition:opacity .4s}
+  #zoneHalo.on{opacity:1;animation:halo 1.4s ease-in-out infinite}
+  @keyframes halo{50%{opacity:.45}}
+
+  @media (prefers-reduced-motion: reduce){
+    #gateMark .ring,#zoneMark .ring,#zoneHalo.on{animation:none}
+    #splash img,#splash .s-eyebrow,#splash .s-title,#splash .s-sub,#splash .s-skip,.lmbox{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splash">
+  <img id="splashImg" src="image_cheikh.png" alt="Cheikh Ould Khaiïry" onerror="this.style.display='none'">
+  <p class="s-eyebrow">Jeunesse Al Khaïry · CICES 2026</p>
+  <div class="s-title">Visite de Cheikh<br>Ould Khaiïry</div>
+  <p class="s-sub">Dalal ak jàmm · Bienvenue · Welcome</p>
+  <p class="s-skip">Toucher pour continuer · Tap to continue</p>
+</div>
+
+<!-- ===== MODAL LANGUES ===== -->
+<div id="langModal" role="dialog" aria-modal="true">
+  <div class="lmbox">
+    <h2>Langue · Làkk · Ɗemngal</h2>
+    <p class="lm-sub">Choisissez votre langue · Choose your language</p>
+    <button class="langbtn" data-lang="wo"><span class="code">WO</span>
+      <span class="nm">Wolof<span class="hi">Dalal ak jàmm — tannal wolof</span></span></button>
+    <button class="langbtn" data-lang="ff"><span class="code">FF</span>
+      <span class="nm">Pulaar<span class="hi">On njaɓɓaama — suɓo pulaar</span></span></button>
+    <button class="langbtn" data-lang="fr"><span class="code">FR</span>
+      <span class="nm">Français<span class="hi">Bienvenue — continuer en français</span></span></button>
+    <button class="langbtn" data-lang="en"><span class="code">EN</span>
+      <span class="nm">English<span class="hi">Welcome — continue in English</span></span></button>
+    <button class="langbtn" data-lang="ar"><span class="code">AR</span>
+      <span class="nm" style="text-transform:none">العربية<span class="hi">مرحبًا — تابع بالعربية</span></span></button>
+  </div>
+</div>
+
+<button id="btnLang" style="display:none">🌐 FR</button>
+
+<div class="wrap">
+  <p class="eyebrow" id="uiEyebrow">Visite de Cheikh Ould Khaiïry · CICES 2026</p>
+  <h1 id="uiTitle">Trouvez votre place</h1>
+  <p class="lede" id="lede">Quelle carte d'accès avez-vous ? Touchez votre carte — nous vous montrons votre porte, le contrôle et votre place.</p>
+
+  <!-- ===== ÉCRAN 1 : CHOIX ===== -->
+  <div id="pick"></div>
+
+  <!-- ===== ÉCRAN 2 : PARCOURS ===== -->
+  <div id="route">
+    <div class="mycard" id="mycard">
+      <span class="ic" id="mcIcon"></span>
+      <span>
+        <span class="t1" id="mcTitle"></span><br>
+        <span class="t2" id="mcSub"></span>
+      </span>
+      <button class="chg" id="btnBack">Changer de carte</button>
+    </div>
+
+    <div class="svg-wrap">
+      <svg id="plan" viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg" aria-label="Plan de la salle">
+        <rect class="platform" x="230" y="48" width="540" height="152" rx="10"/>
+        <text class="zlabel" x="500" y="40" text-anchor="middle" style="fill:var(--gold)">PODIUM</text>
+        <rect class="corridor" x="60" y="138" width="172" height="34" rx="6"/>
+        <text class="zlabel" x="66" y="128" style="fill:var(--gold);font-size:10px" id="lblPriv">ENTRÉE PRIVÉE</text>
+        <rect x="418" y="200" width="42" height="20" rx="3" fill="#1c2f27" stroke="#37564a"/>
+        <rect x="540" y="200" width="42" height="20" rx="3" fill="#1c2f27" stroke="#37564a"/>
+        <g id="podiumSeats"></g>
+        <rect class="throne" x="480" y="150" width="40" height="34" rx="6"/>
+        <text class="zlabel" x="500" y="196" text-anchor="middle" style="font-size:9px">CHEIKH</text>
+
+        <rect class="zone-fill" x="95" y="252" width="235" height="86" rx="8" fill="var(--orange)"/>
+        <rect class="zone-stroke" x="95" y="252" width="235" height="86" rx="8" stroke="var(--orange)"/>
+        <text class="zlabel" x="104" y="270" style="fill:var(--orange)" id="lblFem">FEMMES · 75</text>
+
+        <rect class="zone-fill" x="345" y="252" width="560" height="86" rx="8" fill="var(--green)"/>
+        <rect class="zone-stroke" x="345" y="252" width="560" height="86" rx="8" stroke="var(--green)"/>
+        <text class="zlabel" x="356" y="270" style="fill:var(--green)" id="lblHom">HOMMES · 175</text>
+
+        <line class="cordon" x1="95" y1="352" x2="905" y2="352"/>
+        <text class="zlabel" x="500" y="346" text-anchor="middle" style="fill:var(--red);font-size:10px" id="lblCordon">CORDON DE SÉCURITÉ</text>
+
+        <rect class="zone-fill" x="95" y="368" width="810" height="296" rx="8" fill="var(--grey)"/>
+        <rect class="zone-stroke" x="95" y="368" width="810" height="296" rx="8" stroke="var(--grey)"/>
+        <text class="zlabel" x="500" y="656" text-anchor="middle" id="lblPub">ZONE PUBLIQUE</text>
+
+        <g class="gate"><rect x="40" y="278" width="20" height="44" rx="3"/><text x="34" y="266" text-anchor="start">ORANGE ▸</text></g>
+        <g class="gate"><rect x="940" y="278" width="20" height="44" rx="3"/><text x="872" y="266">◂ VERTE</text></g>
+        <g class="gate"><rect x="40" y="452" width="20" height="44" rx="3"/><text x="66" y="446">PUB. OUEST</text></g>
+        <g class="gate"><rect x="940" y="500" width="20" height="44" rx="3"/><text x="850" y="494">PUB. EST</text></g>
+        <g class="gate"><rect x="478" y="700" width="44" height="20" rx="3"/><text x="500" y="744" text-anchor="middle" id="lblHall">ENTRÉE PUBLIQUE — HALL</text></g>
+
+        <g id="checkpoints"></g>
+
+        <rect id="zoneHalo" x="0" y="0" width="0" height="0" rx="10" fill="none" stroke-width="4"/>
+        <path id="routeGhost" d=""/>
+        <path id="routeLine" d=""/>
+        <g id="gateMark"><circle class="ring" r="12"/><circle class="core" r="4"/></g>
+        <g id="zoneMark" style="opacity:0"><circle class="ring" r="12"/><circle class="core" r="4"/></g>
+
+        <g id="avatar" style="opacity:0">
+          <circle r="11" fill="#fff" opacity=".25"/>
+          <circle r="7" stroke="#fff" stroke-width="2"/>
+          <text y="-16" text-anchor="middle" id="avatarLbl">VOUS</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btnReplay">▶ Revoir mon trajet</button>
+    </div>
+
+    <div class="steps" id="steps"></div>
+    <div class="arrived" id="arrived"></div>
+
+    <div class="consignes">
+      <h4 id="tipsTitle">À retenir</h4>
+      <ul id="tips"></ul>
+    </div>
+  </div>
+
+  <p class="foot"><span>Jeunesse Al Khaïry · CICES — 17 juillet 2026</span><br><span id="uiFoot">Gardez votre carte visible en permanence · Suivez les consignes des agents (brassard rouge)</span></p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const svgNS="http://www.w3.org/2000/svg";
+  const $=id=>document.getElementById(id);
+  const COL={gold:'#d4a83a',green:'#3fa06e',orange:'#e0913c',blue:'#5a92cf',red:'#d0463d',grey:'#8d9c94'};
+
+  /* décor */
+  const podiumSeats=$('podiumSeats');
+  function seatRect(x,y){const r=document.createElementNS(svgNS,'rect');
+    r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',22);r.setAttribute('height',18);
+    r.setAttribute('rx',3);r.setAttribute('class','seat');podiumSeats.appendChild(r);}
+  for(let i=0;i<14;i++)seatRect(258+i*35,66);
+  for(let i=0;i<14;i++)seatRect(275+i*32,102);
+  for(let i=0;i<3;i++){seatRect(238,66+i*40);seatRect(742,66+i*40);}
+  [{x:75,y:300},{x:925,y:300},{x:75,y:474},{x:925,y:522},{x:500,y:690}].forEach(p=>{
+    const el=document.createElementNS(svgNS,'path');const d=8;
+    el.setAttribute('d',`M${p.x} ${p.y-d} L${p.x+d} ${p.y} L${p.x} ${p.y+d} L${p.x-d} ${p.y} Z`);
+    el.setAttribute('class','checkpt');$('checkpoints').appendChild(el);
+  });
+
+  const ICONS={
+    crown:'<path d="M3 17l2.4-9.4 4.1 4.3L12 5.4l2.5 6.5 4.1-4.3L21 17z"/><rect x="3" y="17.5" width="18" height="3" rx="1"/>',
+    person:'<circle cx="12" cy="7" r="3.6"/><path d="M4.5 21c0-4.2 3.3-7.3 7.5-7.3s7.5 3.1 7.5 7.3z"/>',
+    gear:'<path d="M12 8.4a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2zm9 3.6l-2-.6a7 7 0 00-.5-1.3l1-1.8-1.8-1.8-1.8 1a7 7 0 00-1.3-.5L13 4h-2l-.6 2a7 7 0 00-1.3.5l-1.8-1L5.5 7.3l1 1.8a7 7 0 00-.5 1.3L4 11.9l2 .6a7 7 0 00.5 1.3l-1 1.8 1.8 1.8 1.8-1a7 7 0 001.3.5L11 20h2l.6-2a7 7 0 001.3-.5l1.8 1 1.8-1.8-1-1.8a7 7 0 00.5-1.3z"/>',
+    shield:'<path d="M12 2.4l8 3v6c0 5-3.5 8.4-8 9.6C7.5 19.8 4 16.4 4 11.4v-6z"/>',
+    people:'<circle cx="9" cy="7.5" r="3.1"/><circle cx="16.5" cy="8.5" r="2.5"/><path d="M3 20.5c0-3.6 2.9-6.3 6-6.3s6 2.7 6 6.3z"/><path d="M13.5 20.5c0-2.7 1.9-5 4.5-5s4 1.9 4 4.1v.9z"/>'
+  };
+
+  /* ============ GÉOMÉTRIE DES PARCOURS ============ */
+  const ROUTES={
+    or:{color:COL.gold,ink:'#1a1408',icon:'crown',
+      path:[{x:25,y:155},{x:150,y:155},{x:232,y:155},{x:330,y:145},{x:440,y:110}],holds:{2:1.2},
+      gate:{x:60,y:155},zone:{x:230,y:48,w:540,h:152,c:COL.gold},stepIdx:[1,2,4]},
+    verte:{color:COL.green,ink:'#fff',icon:'person',
+      path:[{x:985,y:300},{x:925,y:300},{x:890,y:300},{x:620,y:300}],holds:{1:1.4},
+      gate:{x:950,y:300},zone:{x:345,y:252,w:560,h:86,c:COL.green},stepIdx:[1,2,3]},
+    orange:{color:COL.orange,ink:'#fff',icon:'person',
+      path:[{x:15,y:300},{x:75,y:300},{x:108,y:300},{x:215,y:300}],holds:{1:1.4},
+      gate:{x:50,y:300},zone:{x:95,y:252,w:235,h:86,c:COL.orange},stepIdx:[1,2,3]},
+    bleue:{color:COL.blue,ink:'#fff',icon:'gear',
+      path:[{x:15,y:474},{x:75,y:474},{x:95,y:400},{x:210,y:230},{x:249,y:115}],holds:{1:1.0},
+      gate:{x:50,y:474},zone:{x:230,y:48,w:540,h:152,c:COL.blue},stepIdx:[1,2,4]},
+    rouge:{color:COL.red,ink:'#fff',icon:'shield',
+      path:[{x:120,y:695},{x:110,y:520},{x:250,y:352},{x:430,y:352}],holds:{},
+      gate:{x:120,y:693},zone:{x:95,y:344,w:810,h:16,c:COL.red},stepIdx:[0,2,3]},
+    public:{color:COL.grey,ink:'#fff',icon:'people',
+      path:[{x:500,y:770},{x:500,y:690},{x:500,y:645},{x:500,y:520}],holds:{1:1.4},
+      gate:{x:500,y:710},zone:{x:95,y:368,w:810,h:296,c:COL.grey},stepIdx:[1,2,3]}
+  };
+  const ORDER=['or','verte','orange','bleue','rouge','public'];
+
+  /* ============ TRADUCTIONS ============ */
+  const I18N={
+    fr:{code:'FR',you:'VOUS',
+      ui:{eyebrow:"Visite de Cheikh Ould Khaiïry · CICES 2026",title:"Trouvez votre place",
+        lede:"Quelle carte d'accès avez-vous ? Touchez votre carte — nous vous montrons votre porte, le contrôle et votre place.",
+        replay:"▶ Revoir mon trajet",change:"Changer de carte",
+        arrived:"✓ Vous êtes bien installé·e — bonne cérémonie !",tipsTitle:"À retenir",
+        foot:"Gardez votre carte visible en permanence · Suivez les consignes des agents (brassard rouge)"},
+      routes:{
+        or:{title:"Carte OR",sub:"Cheikh · Délégation officielle",
+          steps:["Présentez-vous à l'<b>entrée privée</b> (côté Ouest du bâtiment) — réservée à la carte OR.",
+            "<b>Contrôle</b> : montrez votre carte OR à l'agent. Le couloir est escorté.",
+            "Installez-vous au <b>podium</b> — 28 fauteuils délégation autour du Cheikh."],
+          tips:["Votre carte n'ouvre que l'entrée privée : ne passez pas par le hall public.",
+            "Arrivez avant H-0:15 — le couloir est stérilisé 10 min avant le cortège.",
+            "Restez assis pendant les discours ; l'appel au podium est nominatif."]},
+        verte:{title:"Carte Verte",sub:"Dignitaires hommes · 1er rang",
+          steps:["Entrez par la <b>porte Est</b> — réservée à la carte VERTE (repère vert).",
+            "<b>Contrôle</b> : carte + nom sur la liste de votre Dahira. Patientez au losange doré.",
+            "Installez-vous en <b>zone Dignitaires Hommes</b>, au 1er rang face au podium."],
+          tips:["Cette porte ne s'ouvre qu'avec la carte verte — le hall public ne mène pas au 1er rang.",
+            "Si vous êtes appelé pour un discours : un agent vous escorte, un seul orateur à la fois.",
+            "Regagnez votre siège immédiatement après votre passage au podium."]},
+        orange:{title:"Carte Orange",sub:"Dignitaires femmes · Zone réservée",
+          steps:["Entrez par la <b>porte Ouest</b> — réservée à la carte ORANGE (repère orange).",
+            "<b>Contrôle</b> : présentez votre carte à l'agente. Entrée exclusivement féminine.",
+            "Installez-vous en <b>zone Dignitaires Femmes</b> (75 places), à l'avant gauche."],
+          tips:["Entrée et zone dédiées pour préserver l'intimité et l'ordre.",
+            "La zone est séparée du public par le cordon : ne le franchissez pas.",
+            "Gardez la carte visible pendant toute la cérémonie."]},
+        bleue:{title:"Carte Bleue",sub:"Organisation · Staff",
+          steps:["Entrez par la <b>porte publique Ouest</b> avec votre carte bleue.",
+            "<b>Contrôle</b> rapide, puis longez le côté Ouest de la salle.",
+            "Rejoignez votre <b>fauteuil staff</b> au podium (3 à gauche, 3 à droite) ou votre poste logistique."],
+          tips:["Empruntez toujours les côtés — jamais le couloir privé du Cheikh.",
+            "Votre carte permet de circuler, mais évitez les zones VIP pendant l'installation.",
+            "Radio/téléphone en vibreur pendant les discours."]},
+        rouge:{title:"Brassard Rouge",sub:"Service d'ordre · Sécurité",
+          steps:["Rassemblement au <b>PC Sécurité</b> (Ouest ou Est) à H-2:30.",
+            "Rejoignez votre <b>poste nominatif</b> : cordon podium, cordon VIP/public ou point de contrôle.",
+            "Tenez la position — <b>aucun poste vide</b>. Relève uniquement sur ordre du PC."],
+          tips:["Brassard visible en permanence.",
+            "Un seul orateur escorté à la fois vers le podium.",
+            "Tout incident : signalement radio au PC, pas d'initiative isolée."]},
+        public:{title:"Participant",sub:"Sans carte · Zone publique",
+          steps:["Entrez par le <b>hall principal</b> (entrée publique Sud) — ou par les portes publiques Ouest/Est.",
+            "<b>Contrôle visuel</b> au losange doré : laissez-vous guider, avancez calmement.",
+            "Installez-vous en <b>zone publique</b> : les agents remplissent rang par rang, de l'avant vers l'arrière."],
+          tips:["Sans carte, l'accès s'arrête au cordon rouge : la zone avant est réservée.",
+            "Ne poussez pas : chacun aura une place (~920 places assises).",
+            "Suivez toujours les indications des agents à brassard rouge."]}
+      }},
+    en:{code:'EN',you:'YOU',
+      ui:{eyebrow:"Visit of Cheikh Ould Khaiïry · CICES 2026",title:"Find your seat",
+        lede:"Which access card do you have? Tap your card — we will show you your gate, the checkpoint and your seat.",
+        replay:"▶ Replay my route",change:"Change card",
+        arrived:"✓ You are seated — enjoy the ceremony!",tipsTitle:"Remember",
+        foot:"Keep your card visible at all times · Follow the instructions of the officers (red armband)"},
+      routes:{
+        or:{title:"GOLD Card",sub:"Cheikh · Official delegation",
+          steps:["Go to the <b>private entrance</b> (West side of the building) — GOLD card only.",
+            "<b>Checkpoint</b>: show your GOLD card to the officer. The corridor is escorted.",
+            "Take your seat on the <b>podium</b> — 28 delegation seats around the Cheikh."],
+          tips:["Your card only opens the private entrance: do not go through the public hall.",
+            "Arrive before H-0:15 — the corridor is cleared 10 min before the procession.",
+            "Remain seated during speeches; podium calls are by name."]},
+        verte:{title:"Green Card",sub:"Male dignitaries · Front row",
+          steps:["Enter through the <b>East gate</b> — GREEN card only (green sign).",
+            "<b>Checkpoint</b>: card + name on your Dahira list. Wait at the gold diamond.",
+            "Sit in the <b>Men's dignitaries area</b>, front row facing the podium."],
+          tips:["Only the green card opens this gate — the public hall does not lead to the front row.",
+            "If called to speak, an officer escorts you — one speaker at a time.",
+            "Return to your seat immediately after your speech."]},
+        orange:{title:"Orange Card",sub:"Female dignitaries · Reserved area",
+          steps:["Enter through the <b>West gate</b> — ORANGE card only (orange sign).",
+            "<b>Checkpoint</b>: show your card to the female officer. Women-only entrance.",
+            "Sit in the <b>Women's dignitaries area</b> (75 seats), front left."],
+          tips:["Dedicated entrance and area for privacy and order.",
+            "The area is separated from the public by the cordon: do not cross it.",
+            "Keep your card visible during the whole ceremony."]},
+        bleue:{title:"Blue Card",sub:"Organisation · Staff",
+          steps:["Enter through the <b>West public gate</b> with your blue card.",
+            "Quick <b>check</b>, then walk along the West side of the hall.",
+            "Reach your <b>staff seat</b> on the podium (3 left, 3 right) or your duty post."],
+          tips:["Always use the sides — never the Cheikh's private corridor.",
+            "Your card lets you move around, but avoid VIP areas during setup.",
+            "Radio/phone on vibrate during speeches."]},
+        rouge:{title:"Red Armband",sub:"Security · Crowd control",
+          steps:["Muster at the <b>Security post</b> (West or East) at H-2:30.",
+            "Take your <b>assigned position</b>: podium line, VIP/public cordon or a checkpoint.",
+            "Hold your position — <b>no post left empty</b>. Relief only on PC order."],
+          tips:["Armband visible at all times.",
+            "One speaker escorted to the podium at a time.",
+            "Any incident: radio the PC — no isolated initiative."]},
+        public:{title:"Attendee",sub:"No card · Public area",
+          steps:["Enter through the <b>main hall</b> (South public entrance) — or the West/East public gates.",
+            "<b>Visual check</b> at the gold diamond: move forward calmly.",
+            "Sit in the <b>public area</b>: officers fill it row by row, front to back."],
+          tips:["Without a card, access stops at the red cordon: the front area is reserved.",
+            "Do not push — everyone will have a seat (~920 seats).",
+            "Always follow the officers with red armbands."]}
+      }},
+    wo:{code:'WO',you:'YOW',
+      ui:{eyebrow:"Ganesi Cheikh Ould Khaiïry · CICES 2026",title:"Wutal sa toogukaay",
+        lede:"Ban kàrt nga am ? Bësal ci sa kàrt — dinanu la won sa bunt, saytu bi ak sa toogukaay.",
+        replay:"▶ Seetaat sama yoon",change:"Soppi kàrt",
+        arrived:"✓ Toog nga bu baax — yendu bu neex !",tipsTitle:"Lu nga war a xam",
+        foot:"Sa kàrt war naa feeñ saa su ne · Toppal ndigalu takk-der yi (brasaar bu xonq)"},
+      routes:{
+        or:{title:"Kàrt OR",sub:"Cheikh ak gungeem",
+          steps:["Demal ci <b>bunt piriwe bi</b> (wetu sowwu) — kàrt OR rekk a fay dugg.",
+            "<b>Saytu</b> : wonal sa kàrt OR. Dees na la gunge ci yoon wi.",
+            "Toogal ci <b>podium bi</b> — 28 toogu wër Cheikh bi."],
+          tips:["Sa kàrt, bunt piriwe bi rekk lay ubbi — bul jaar ci hall bi.",
+            "Ñëwal balaa H-0:15 — yoon wi dees koy tëj 10 simili balaa Cheikh bi di agsi.",
+            "Toogal te bul jóg — ku ñu woo ci podium bi rekk a fay yéeg."]},
+        verte:{title:"Kàrt Werte",sub:"Góor ñi am maqaama · Rang bu jëkk",
+          steps:["Duggal ci <b>buntu penku bi</b> — kàrt werte rekk (màndarga wu wert).",
+            "<b>Saytu</b> : sa kàrt ak sa tur ci limu sa Dahira. Xaaral ci losange bu mboq bi.",
+            "Toogal ci <b>béréb u góor ñi am maqaama</b>, rang bu jëkk, jàkkaarloo ak podium bi."],
+          tips:["Kàrt werte rekk a man a ubbi bunt bii — hall bi du yóbbu ci rang bu jëkk.",
+            "Bu ñu la wooyee ngir wax : takk-der moo lay gunge, kenn rekk ci podium bi.",
+            "Bu nga waxee ba noppi, dellul ci sa toogu ci saa si."]},
+        orange:{title:"Kàrt Orange",sub:"Jigéen ñi am maqaama · Béréb bu ñu denc",
+          steps:["Duggal ci <b>buntu sowwu bi</b> — kàrt orange rekk (màndarga wu orange).",
+            "<b>Saytu</b> : wonal sa kàrt. Bunt bu jigéen rekk la.",
+            "Toogal ci <b>béréb u jigéen ñi am maqaama</b> (75 toogu), ci kanam càmmooñ."],
+          tips:["Bunt ak béréb bu jigéen ñi rekk, ngir kersa ak teey.",
+            "Bul jàll cordon bu xonq bi : dafa tàqale béréb bi ak askan wi.",
+            "Sa kàrt war naa feeñ ba yendu bi jeex."]},
+        bleue:{title:"Kàrt Bleue",sub:"Way-tërëlin · Liggéeykat yi",
+          steps:["Duggal ci <b>buntu sowwu bu askan wi</b> ak sa kàrt bleue.",
+            "<b>Saytu</b> bu gaaw, door a jaar ci wetu sowwu bi.",
+            "Demal ci sa <b>toogu podium</b> (3 càmmooñ, 3 ndeyjoor) walla sa poste."],
+          tips:["Jaaral ci wet yi rekk — bul jaar mukk ci yoonu Cheikh bi.",
+            "Sa kàrt may na la wëndéelu, waaye moytul béréb VIP yi.",
+            "Telefon ci vibreur bu waxtaan yi di dox."]},
+        rouge:{title:"Brasaar bu Xonq",sub:"Kaaraange · Saytu mbooloo",
+          steps:["Dajeleen ci <b>PC kaaraange</b> (sowwu walla penku) ci H-2:30.",
+            "Demal ci sa <b>poste</b> : cordon podium, cordon VIP/askan walla saytu.",
+            "Toppatool sa poste — <b>benn poste du des neen</b>. Ndigalu PC rekk."],
+          tips:["Brasaar bi war naa feeñ saa su ne.",
+            "Kenn rekk ñu koy gunge ci podium bi.",
+            "Lu xew : yégalal PC bi ci rajo — bul jël dogal ci sa bopp."]},
+        public:{title:"Gan",sub:"Amul kàrt · Béréb u askan wi",
+          steps:["Duggal ci <b>hall bu mag bi</b> (buntu bëj-saalum) walla buntu sowwu/penku.",
+            "<b>Saytu</b> ci losange bu mboq bi : jëmal kanam ci jàmm ak teey.",
+            "Toogal ci <b>béréb u askan wi</b> : takk-der yi dañuy fees rang ba rang."],
+          tips:["Boo amul kàrt, ba cordon bu xonq bi rekk nga man a dem : kanam gi dees na ko denc.",
+            "Bul buuxante — ku ne dina am toogu (lu tollu ci 920).",
+            "Toppal takk-der yi (brasaar bu xonq) saa su ne."]}
+      }},
+    ff:{code:'FF',you:'AAN',
+      ui:{eyebrow:"Njillu Cheikh Ould Khaiïry · CICES 2026",title:"Yiytu jooɗorde maa",
+        lede:"Karte hondu maraa ? Ɓam karte maa — min hollete damal maa, ƴeewndo ngo e jooɗorde maa.",
+        replay:"▶ Ndaartu laawol am",change:"Waylu karte",
+        arrived:"✓ A jooɗike no moƴƴi — ñalnde belnde !",tipsTitle:"Ko haanɗaa anndude",
+        foot:"Karte maa yo feeño sahaa kala · Jokku jamirooje halfinaaɓe kisal (bras boɗeejo)"},
+      routes:{
+        or:{title:"Karte OR",sub:"Ceerno e nulaaɓe makko",
+          steps:["Yah to <b>damal keeriingal</b> (bannge hiirnaange) — ko karte OR tan.",
+            "<b>Ƴeewndo</b> : hollu karte OR maa. A ɗowete haa podium.",
+            "Jooɗo e <b>podium</b> — jooɗorɗe 28 taariiɗe Ceerno."],
+          tips:["Karte maa ko damal keeriingal tan udditta — wata rew e hall renndo.",
+            "Ar ko adii H-0:15 — laawol ngol uddete 10 hojomaaji ko adii garal Ceerno.",
+            "Jooɗo — ko noddaaɗo tan ƴeeŋata podium."]},
+        verte:{title:"Karte Werte",sub:"Worɓe tedduɓe · Laylol aranol",
+          steps:["Naat e <b>damal fuɗnaange</b> — ko karte werte tan (maande wertere).",
+            "<b>Ƴeewndo</b> : karte e innde maa e doggol Dahira maa. Fadu to losange kanŋeejo.",
+            "Jooɗo e <b>nokku worɓe tedduɓe</b>, laylol aranol yeeso podium."],
+          tips:["Ko karte werte tan udditta ngal damal — hall renndo yahataa haa laylol aranol.",
+            "So a noddaama haala : halfinaaɗo ɗowete, gooto tan e podium.",
+            "Ruttoo e jooɗorde maa law caggal konngol maa."]},
+        orange:{title:"Karte Orange",sub:"Rewɓe tedduɓe · Nokku keeriiɗo",
+          steps:["Naat e <b>damal hiirnaange</b> — ko karte orange tan (maande orange).",
+            "<b>Ƴeewndo</b> : hollu karte maa. Damal rewɓe tan.",
+            "Jooɗo e <b>nokku rewɓe tedduɓe</b> (jooɗorɗe 75), yeeso nano."],
+          tips:["Damal e nokku keeriiɗo wonande rewɓe, ngam teddungal e deeƴre.",
+            "Wata taccu ɓoggol boɗeewol (cordon) : ngol seerndii nokku oo e renndo.",
+            "Karte maa yo feeño haa timmoode ñalawma oo."]},
+        bleue:{title:"Karte Bleue",sub:"Gollotooɓe · Staff",
+          steps:["Naat e <b>damal renndo hiirnaange</b> e karte bleue maa.",
+            "<b>Ƴeewndo</b> yaawngo, refti rew e bannge hiirnaange.",
+            "Yettoo e <b>jooɗorde staff</b> e podium (3 nano, 3 ñaamo) maa poste maa."],
+          tips:["Rew e seraaji tan — wata rew e laawol keeriingal Ceerno.",
+            "Wata naat e nokkuuji VIP tuma teelti.",
+            "Noddirgel e vibreur tuma haalaaji."]},
+        rouge:{title:"Bras Boɗeejo",sub:"Kisal · Reenugol jamaa",
+          steps:["Renndu to <b>PC kisal</b> (hiirnaange maa fuɗnaange) e H-2:30.",
+            "Yah e <b>poste maa</b> : cordon podium, cordon VIP/renndo maa ƴeewndo.",
+            "Jogo e poste maa — <b>alaa poste ɗalaaɗo</b>. Ko yamiroore PC tan."],
+          tips:["Bras oo yo feeño sahaa kala.",
+            "Gooto tan ɗowete haa podium.",
+            "Kala ko kewi : tintin PC e rajo — wata gollo e hoore maa."]},
+        public:{title:"Tawtoraaɗo",sub:"Alaa karte · Nokku renndo",
+          steps:["Naat e <b>hall mawɗo</b> (damal worgo) maa damalji renndo hiirnaange/fuɗnaange.",
+            "<b>Ƴeewndo</b> to losange kanŋeejo : yaa yeeso e deeƴre.",
+            "Jooɗo e <b>nokku renndo</b> : laylol e laylol, gila yeeso haa caggal."],
+          tips:["So a alaa karte, haaɗat e ɓoggol boɗeewol : yeeso ngo ko keeriiɗo.",
+            "Wata duñondir — mo woni kala heɓat jooɗorde (~920).",
+            "Jokku halfinaaɓe kisal (bras boɗeejo) sahaa kala."]}
+      }},
+    ar:{code:'AR',you:'أنت',
+      ui:{eyebrow:"زيارة الشيخ ولد خيري · CICES 2026",title:"اعثر على مكانك",
+        lede:"ما هي بطاقة الدخول التي تحملها؟ اضغط على بطاقتك — نُريك بابك ونقطة التفتيش ومكان جلوسك.",
+        replay:"▶ إعادة عرض مساري",change:"تغيير البطاقة",
+        arrived:"✓ جلست في مكانك — حفلًا مباركًا !",tipsTitle:"تذكَّر",
+        foot:"أبقِ بطاقتك ظاهرة دائمًا · اتبع تعليمات أعوان الأمن (شارة حمراء)"},
+      routes:{
+        or:{title:"البطاقة الذهبية",sub:"الشيخ · الوفد الرسمي",
+          steps:["توجَّه إلى <b>المدخل الخاص</b> (الجهة الغربية للمبنى) — للبطاقة الذهبية فقط.",
+            "<b>التفتيش</b> : أظهر بطاقتك الذهبية للعون. الممر مُرافَق.",
+            "اجلس في <b>المنصة</b> — 28 مقعدًا للوفد حول الشيخ."],
+          tips:["بطاقتك لا تفتح إلا المدخل الخاص : لا تمر عبر القاعة العامة.",
+            "احضر قبل H-0:15 — يُغلق الممر قبل الموكب بعشر دقائق.",
+            "ابقَ جالسًا أثناء الخطب ؛ النداء إلى المنصة يكون بالاسم."]},
+        verte:{title:"البطاقة الخضراء",sub:"أعيان الرجال · الصف الأول",
+          steps:["ادخل من <b>البوابة الشرقية</b> — البطاقة الخضراء فقط (علامة خضراء).",
+            "<b>التفتيش</b> : البطاقة والاسم في قائمة دائرتك. انتظر عند المعيَّن الذهبي.",
+            "اجلس في <b>منطقة أعيان الرجال</b>، الصف الأول قبالة المنصة."],
+          tips:["هذه البوابة لا تُفتح إلا بالبطاقة الخضراء — القاعة العامة لا تؤدي إلى الصف الأول.",
+            "إذا نوديت للخطابة : يرافقك عون، متحدث واحد في كل مرة.",
+            "عُد إلى مقعدك فور انتهاء كلمتك."]},
+        orange:{title:"البطاقة البرتقالية",sub:"أعيان النساء · منطقة مخصصة",
+          steps:["ادخلي من <b>البوابة الغربية</b> — البطاقة البرتقالية فقط (علامة برتقالية).",
+            "<b>التفتيش</b> : أظهري بطاقتك للعونة. مدخل نسائي حصري.",
+            "اجلسي في <b>منطقة أعيان النساء</b> (75 مقعدًا)، في الأمام يسارًا."],
+          tips:["مدخل ومنطقة مخصصان حفاظًا على الخصوصية والنظام.",
+            "المنطقة مفصولة عن الجمهور بالحاجز : لا تتجاوزيه.",
+            "أبقي البطاقة ظاهرة طوال الحفل."]},
+        bleue:{title:"البطاقة الزرقاء",sub:"التنظيم · الطاقم",
+          steps:["ادخل من <b>البوابة العامة الغربية</b> ببطاقتك الزرقاء.",
+            "<b>تفتيش</b> سريع، ثم سر بمحاذاة الجهة الغربية للقاعة.",
+            "التحق بمقعدك في <b>المنصة</b> (3 يسارًا، 3 يمينًا) أو بموقع عملك."],
+          tips:["استخدم الجوانب دائمًا — لا تمر أبدًا عبر ممر الشيخ الخاص.",
+            "تجنب مناطق كبار الزوار أثناء التجهيز.",
+            "الهاتف على وضع الاهتزاز أثناء الخطب."]},
+        rouge:{title:"الشارة الحمراء",sub:"الأمن · حفظ النظام",
+          steps:["التجمع في <b>مركز الأمن</b> (غربًا أو شرقًا) على الساعة H-2:30.",
+            "التحق <b>بموقعك المحدد</b> : حاجز المنصة، حاجز الجمهور، أو نقطة تفتيش.",
+            "اثبت في موقعك — <b>لا يُترك أي موقع شاغرًا</b>. التبديل بأمر المركز فقط."],
+          tips:["الشارة ظاهرة دائمًا.",
+            "متحدث واحد يُرافَق إلى المنصة في كل مرة.",
+            "أي حادث : بلِّغ المركز عبر اللاسلكي — لا مبادرات فردية."]},
+        public:{title:"مشارك",sub:"بدون بطاقة · المنطقة العامة",
+          steps:["ادخل من <b>القاعة الرئيسية</b> (المدخل الجنوبي) أو من البوابتين العامتين الغربية/الشرقية.",
+            "<b>تفتيش بصري</b> عند المعيَّن الذهبي : تقدَّم بهدوء.",
+            "اجلس في <b>المنطقة العامة</b> : يملأ الأعوان الصفوف صفًا صفًا من الأمام إلى الخلف."],
+          tips:["بدون بطاقة يتوقف الدخول عند الحاجز الأحمر : المنطقة الأمامية محجوزة.",
+            "لا تدفع — للجميع مقعد (~920 مقعدًا).",
+            "اتبع دائمًا الأعوان ذوي الشارات الحمراء."]}
+      }}
+  };
+
+  let lang='fr';
+  try{lang=localStorage.getItem('monacces_lang')||'fr';}catch(e){}
+  if(!I18N[lang])lang='fr';
+  let curKey=null;
+
+  /* ============ écran 1 : boutons ============ */
+  const pick=$('pick');
+  function renderPick(){
+    const L=I18N[lang];
+    pick.innerHTML='';
+    ORDER.forEach(k=>{
+      const r=ROUTES[k],tx=L.routes[k];
+      const b=document.createElement('button');
+      b.className='pickbtn'+(k==='public'?' pub':'');
+      b.innerHTML=`<span class="band" style="background:${r.color}"></span>
+        <h3>${tx.title}</h3><p>${tx.sub}</p>`;
+      b.addEventListener('click',()=>select(k));
+      pick.appendChild(b);
+    });
+  }
+
+  function applyLang(l){
+    lang=l;try{localStorage.setItem('monacces_lang',l);}catch(e){}
+    document.documentElement.lang=l;
+    document.documentElement.dir=(l==='ar')?'rtl':'ltr';
+    const L=I18N[l];
+    $('uiEyebrow').textContent=L.ui.eyebrow;
+    $('uiTitle').textContent=L.ui.title;
+    $('lede').textContent=L.ui.lede;
+    $('btnReplay').textContent=L.ui.replay;
+    $('btnBack').textContent=L.ui.change;
+    $('tipsTitle').textContent=L.ui.tipsTitle;
+    $('arrived').textContent=L.ui.arrived;
+    $('uiFoot').textContent=L.ui.foot;
+    $('avatarLbl').textContent=L.you;
+    $('btnLang').textContent='🌐 '+L.code;
+    renderPick();
+    if(curKey&&$('route').style.display==='block')select(curKey,true);
+  }
+
+  /* ============ moteur d'animation ============ */
+  const avatar=$('avatar'), routeLine=$('routeLine'), routeGhost=$('routeGhost'),
+        gateMark=$('gateMark'), zoneMark=$('zoneMark'), zoneHalo=$('zoneHalo'),
+        stepsBox=$('steps'), arrived=$('arrived');
+  let cur=null, wp=[], totalLen=0, t0=null, raf=null, DUR=0;
+  const SPEED=95;
+
+  function buildTimes(route){
+    wp=[];totalLen=0;
+    let t=0.6;
+    const pts=route.path;
+    wp.push({t,x:pts[0].x,y:pts[0].y,len:0});
+    for(let i=1;i<pts.length;i++){
+      const L=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);
+      totalLen+=L;t+=L/SPEED;
+      wp.push({t,x:pts[i].x,y:pts[i].y,len:totalLen});
+      if(route.holds[i]){t+=route.holds[i];wp.push({t,x:pts[i].x,y:pts[i].y,len:totalLen});}
+    }
+    DUR=t+0.4;
+  }
+
+  function stateAt(t){
+    if(t<=wp[0].t)return{x:wp[0].x,y:wp[0].y,len:0,seg:0};
+    const last=wp[wp.length-1];
+    if(t>=last.t)return{x:last.x,y:last.y,len:totalLen,seg:wp.length-1};
+    for(let i=1;i<wp.length;i++){
+      if(t<=wp[i].t){
+        const a=wp[i-1],b=wp[i];
+        const f=(b.t===a.t)?1:(t-a.t)/(b.t-a.t);
+        return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,len:a.len+(b.len-a.len)*f,seg:i};
+      }
+    }
+    return{x:last.x,y:last.y,len:totalLen,seg:wp.length-1};
+  }
+
+  function ptIndexOfWp(route,seg){
+    let pi=0;
+    for(let i=1;i<=seg&&i<wp.length;i++){
+      if(wp[i].len>wp[i-1].len||wp[i].t===wp[i-1].t)pi++;
+    }
+    return Math.min(pi,route.path.length-1);
+  }
+
+  function renderFrame(t){
+    const s=stateAt(t);
+    avatar.style.opacity=1;
+    avatar.setAttribute('transform',`translate(${s.x.toFixed(1)},${s.y.toFixed(1)})`);
+    routeLine.setAttribute('stroke-dasharray',totalLen);
+    routeLine.setAttribute('stroke-dashoffset',Math.max(0,totalLen-s.len));
+    let reached=0;
+    for(let i=1;i<wp.length;i++)if(t>=wp[i].t)reached=i;
+    const pi=ptIndexOfWp(cur,reached);
+    const items=[...stepsBox.children];
+    items.forEach((el,ix)=>{
+      const si=cur.stepIdx[ix];
+      el.classList.toggle('done',pi>si||t>=DUR);
+      el.classList.toggle('on',pi>=Math.max(0,si-1)&&pi<=si&&t<DUR);
+    });
+    const end=t>=DUR;
+    arrived.classList.toggle('on',end);
+    zoneHalo.classList.toggle('on',end);
+    zoneMark.style.opacity=end?1:0;
+  }
+
+  function play(){
+    cancelAnimationFrame(raf);t0=null;
+    function loop(ts){
+      if(t0==null)t0=ts;
+      const t=(ts-t0)/1000;
+      renderFrame(Math.min(t,DUR));
+      if(t<DUR)raf=requestAnimationFrame(loop);
+    }
+    raf=requestAnimationFrame(loop);
+  }
+
+  function select(key,keepScroll){
+    curKey=key;cur=ROUTES[key];
+    const tx=I18N[lang].routes[key];
+    buildTimes(cur);
+    $('pick').style.display='none';$('lede').style.display='none';
+    $('route').style.display='block';
+    const mc=$('mycard');
+    mc.style.setProperty('--cardbg',cur.color);
+    mc.style.setProperty('--cardink',cur.ink);
+    $('mcIcon').innerHTML=`<svg viewBox="0 0 24 24">${ICONS[cur.icon]}</svg>`;
+    $('mcTitle').textContent=tx.title;
+    $('mcSub').textContent=tx.sub;
+    const dStr='M'+cur.path.map(p=>`${p.x},${p.y}`).join(' L');
+    routeGhost.setAttribute('d',dStr);routeGhost.setAttribute('stroke',cur.color);
+    routeLine.setAttribute('d',dStr);routeLine.setAttribute('stroke',cur.color);
+    gateMark.setAttribute('transform',`translate(${cur.gate.x},${cur.gate.y})`);
+    gateMark.querySelector('.ring').setAttribute('stroke',cur.color);
+    gateMark.querySelector('.core').setAttribute('fill',cur.color);
+    const dest=cur.path[cur.path.length-1];
+    zoneMark.setAttribute('transform',`translate(${dest.x},${dest.y})`);
+    zoneMark.querySelector('.ring').setAttribute('stroke',cur.color);
+    zoneMark.querySelector('.core').setAttribute('fill',cur.color);
+    zoneHalo.setAttribute('x',cur.zone.x);zoneHalo.setAttribute('y',cur.zone.y);
+    zoneHalo.setAttribute('width',cur.zone.w);zoneHalo.setAttribute('height',cur.zone.h);
+    zoneHalo.setAttribute('stroke',cur.zone.c);
+    avatar.querySelectorAll('circle')[1].setAttribute('fill',cur.color);
+    stepsBox.innerHTML=tx.steps.map((s,i)=>
+      `<div class="step"><span class="n"><span>${i+1}</span></span><span class="tx">${s}</span></div>`).join('');
+    $('tips').innerHTML=tx.tips.map(t=>`<li>${t}</li>`).join('');
+    arrived.classList.remove('on');zoneHalo.classList.remove('on');zoneMark.style.opacity=0;
+    if(!keepScroll&&window.scrollTo)try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){}
+    play();
+  }
+
+  $('btnReplay').addEventListener('click',play);
+  $('btnBack').addEventListener('click',()=>{
+    cancelAnimationFrame(raf);curKey=null;
+    $('route').style.display='none';
+    $('pick').style.display='grid';$('lede').style.display='block';
+  });
+
+  /* ============ splash + modal langues ============ */
+  const splash=$('splash'), langModal=$('langModal'), btnLang=$('btnLang');
+  let splashDone=false;
+  function closeSplash(){
+    if(splashDone)return;splashDone=true;
+    splash.classList.add('hide');
+    setTimeout(()=>{splash.style.display='none';langModal.classList.add('on');},650);
+  }
+  const splashTimer=setTimeout(closeSplash,2600);
+  splash.addEventListener('click',()=>{clearTimeout(splashTimer);closeSplash();});
+
+  /* protection des images */
+  document.addEventListener('contextmenu',e=>{if(e.target.closest('img'))e.preventDefault();});
+  document.addEventListener('dragstart',e=>{if(e.target&&e.target.tagName==='IMG')e.preventDefault();});
+
+  document.querySelectorAll('.langbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      applyLang(b.dataset.lang);
+      langModal.classList.remove('on');
+      btnLang.style.display='block';
+    });
+  });
+  btnLang.addEventListener('click',()=>langModal.classList.add('on'));
+
+  applyLang(lang);
+
+  window.__monacces={select,renderFrame,applyLang,closeSplash,routes:ROUTES,i18n:I18N,getDur:()=>DUR,getLang:()=>lang};
+})();
+</script>
+</body>
+</html>

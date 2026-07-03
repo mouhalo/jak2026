@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerie — Jeunesse Al Khaïry 2026</title>
+<meta name="description" content="Galerie photos de Jeunesse Al Khaïry et de la visite de Cheikh Ould Khaiïry — CICES, Dakar, juillet 2026.">
+<link rel="canonical" href="https://jak.sn/galerie.html">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jeunesse Al Khaïry">
+<meta property="og:title" content="Galerie — Jeunesse Al Khaïry 2026">
+<meta property="og:description" content="Photos de Jeunesse Al Khaïry et de la visite du Cheikh au CICES de Dakar.">
+<meta property="og:url" content="https://jak.sn/galerie.html">
+<meta property="og:image" content="https://jak.sn/image_cheikh.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jak.sn/image_cheikh.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="site.js"></script>
+</head>
+<body>
+<main>
+  <div style="padding:36px 0 8px;text-align:center">
+    <p class="eyebrow" id="pgEyebrow"></p>
+    <h1>Jeunesse Al Khaïry</h1>
+    <p class="devise" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:4px 0 20px">Dévouer · Engager · Servir</p>
+    <div id="caroMount"></div>
+  </div>
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secAll"></h2>
+    <div class="gal" id="galGrid"></div>
+  </div></section>
+</main>
+<script>
+(function(){
+  const D=window.SITE_DATA;
+  renderChrome('galerie');
+  document.getElementById('pgEyebrow').textContent=D.settings.event_nom+' · '+D.settings.dates_texte;
+  const items=(D.galerie||[]).filter(g=>g.src);
+  window.__caro=initCarousel(document.getElementById('caroMount'),items,{delay:4000});
+  document.getElementById('secAll').textContent=T('galerie');
+  document.getElementById('galGrid').innerHTML=items.map((g,i)=>
+    `<figure style="cursor:pointer"><img src="${esc(g.src)}" loading="lazy" alt="">`+
+    (g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:'')+`</figure>`).join('');
+})();
+</script>
+</body>
+</html>

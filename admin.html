@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Site Visite du Cheikh 2026</title>
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<style>
+  .abar{position:sticky;top:0;z-index:40;background:rgba(13,27,22,.95);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .abar h1{font-size:clamp(18px,4vw,24px);margin:0;margin-right:auto}
+  .abtn{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.05em;
+    font-weight:600;font-size:14px;cursor:pointer;border-radius:9px;padding:9px 14px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink)}
+  .abtn.gold{background:var(--gold);color:#1a1408;border-color:var(--gold)}
+  .abtn.red{background:transparent;color:#ff9d94;border-color:#7a3a34}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+  .tab{font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;padding:9px 13px;
+    border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--muted)}
+  .tab.on{background:var(--gold);color:#1a1408;font-weight:600;border-color:var(--gold)}
+  .pane{display:none}.pane.on{display:block}
+  .frm{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .frm h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:17px;
+    margin:0 0 12px;color:var(--gold);display:flex;align-items:center;gap:8px}
+  .frm h3 .del{margin-left:auto;cursor:pointer;background:none;border:1px solid #7a3a34;color:#ff9d94;
+    border-radius:8px;padding:4px 10px;font-size:11px;font-family:'IBM Plex Mono',monospace}
+  label.f{display:block;margin-bottom:10px;font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  label.f input[type=text],label.f textarea,label.f select{
+    display:block;width:100%;margin-top:4px;background:#0f2019;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-family:'Inter',sans-serif;font-size:14px}
+  label.f textarea{min-height:84px;resize:vertical}
+  .photorow{display:flex;align-items:center;gap:12px;margin-top:4px}
+  .photorow img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--panel-2)}
+  .photorow input[type=file]{color:var(--muted);font-size:12px}
+  .grid2c{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  @media(max-width:640px){.grid2c{grid-template-columns:1fr}}
+  .note{background:rgba(212,168,58,.08);border:1px solid rgba(212,168,58,.35);border-radius:12px;
+    padding:12px 15px;font-size:13px;line-height:1.6;margin-bottom:16px}
+  .note b{color:var(--gold)}
+  .saved{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="abar">
+  <h1>⚙️ Administration du site</h1>
+  <span class="saved" id="savedMsg"></span>
+  <button class="abtn" id="btnDraft">💾 Enregistrer le brouillon</button>
+  <button class="abtn gold" id="btnExport">⬇ Exporter data.js</button>
+  <button class="abtn red" id="btnReset">Réinitialiser</button>
+</div>
+<div class="wrap" style="padding-top:14px;padding-bottom:60px">
+  <div class="note"><b>Mode d'emploi :</b> <b>1)</b> Modifiez les contenus puis cliquez <b>💾 Enregistrer le brouillon</b> :
+    les pages du site se mettent à jour immédiatement <b>sur cet appareil</b> (rechargez la page du site).
+    <b>2)</b> Pour publier pour tout le monde : cliquez <b>⬇ Exporter data.js</b> et remplacez le fichier
+    <b>data.js</b> du dossier du site (puis re-téléversez-le sur l'hébergement). Les textes entre <span class="todo">[À COMPLÉTER]</span> apparaissent en
+    orange sur le site tant qu'ils ne sont pas remplacés.</div>
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-p="reglages">⚙ Réglages</div>
+    <div class="tab" data-p="cheikh">👤 Le Cheikh</div>
+    <div class="tab" data-p="dignitaires">🎖 Dignitaires</div>
+    <div class="tab" data-p="jak">🤝 Membres JAK</div>
+    <div class="tab" data-p="galerie">🖼 Galerie</div>
+  </div>
+  <div class="pane on" id="pane-reglages"></div>
+  <div class="pane" id="pane-cheikh"></div>
+  <div class="pane" id="pane-dignitaires"></div>
+  <div class="pane" id="pane-jak"></div>
+  <div class="pane" id="pane-galerie"></div>
+</div>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D=JSON.parse(JSON.stringify(window.SITE_DATA));
+try{const d=localStorage.getItem('admin_draft');if(d){D=JSON.parse(d);msg('Brouillon restauré');}}catch(e){}
+
+function msg(t){$('#savedMsg').textContent=t;setTimeout(()=>{$('#savedMsg').textContent='';},2500);}
+
+/* ---- champs génériques ---- */
+function fld(label,path,type,opts){
+  const v=get(path);
+  if(type==='textarea')return `<label class="f">${label}<textarea data-path="${path}">${esc(v)}</textarea></label>`;
+  if(type==='select')return `<label class="f">${label}<select data-path="${path}">${
+    opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select></label>`;
+  return `<label class="f">${label}<input type="text" data-path="${path}" value="${esc(v)}"></label>`;
+}
+function photoFld(label,path,folder){
+  const v=get(path);
+  const hint=folder?`<div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:none;letter-spacing:0">\u{1F4C1} Dossier d\u00e9di\u00e9 : <b style="color:var(--gold)">${folder}</b> \u2014 d\u00e9posez-y le fichier photo puis saisissez \u00ab ${folder}nom.jpg \u00bb, ou importez ci-dessous (photo int\u00e9gr\u00e9e au site).</div>`:'';
+  return `<label class="f">${label}${hint}<div class="photorow">
+    <img src="${esc(v)||''}" onerror="this.style.opacity=.15" data-preview="${path}">
+    <input type="file" accept="image/*" data-photo="${path}">
+    <input type="text" data-path="${path}" value="${esc(v)}" placeholder="nom de fichier ou photo importée" style="flex:1">
+  </div></label>`;
+}
+function get(path){return path.split('.').reduce((o,k)=>o==null?o:o[/^\d+$/.test(k)?+k:k],D);}
+function set(path,val){const ks=path.split('.');const last=ks.pop();
+  const o=ks.reduce((o,k)=>o[/^\d+$/.test(k)?+k:k],D);o[/^\d+$/.test(last)?+last:last]=val;}
+
+/* ---- panes ---- */
+function renderReglages(){
+  $('#pane-reglages').innerHTML=`<div class="frm"><h3>Événement</h3><div class="grid2c">
+    ${fld("Nom de l'événement","settings.event_nom")}
+    ${fld("Organisateur","settings.organisateur")}
+    ${fld("Lieu","settings.lieu")}
+    ${fld("Dates (texte affiché)","settings.dates_texte")}
+    ${fld("Compte à rebours (AAAA-MM-JJTHH:MM:SS)","settings.date_compte_rebours")}
+    </div></div>
+    <div class="frm"><h3>Contact & soutien</h3><div class="grid2c">
+    ${fld("Numéro 1 (Wave · OM · WhatsApp)","settings.whatsapp.0")}
+    ${fld("Numéro 2 (Wave · OM · WhatsApp)","settings.whatsapp.1")}
+    ${fld("Numéro 3 (Wave · OM · WhatsApp)","settings.whatsapp.2")}
+    ${fld("Note sous le bloc soutien","settings.note_soutien")}
+    </div></div>
+    <div class="frm"><h3>Présentation JAK (page Jeunesse Al Khaïry)</h3>
+    ${fld("Texte de présentation","settings.jak_presentation","textarea")}</div>
+    <div class="frm"><h3>Programme (3 jours)</h3>${D.settings.programme.map((p,i)=>`
+      <div class="grid2c">
+      ${fld("Jour","settings.programme."+i+".jour")}
+      ${fld("Titre","settings.programme."+i+".titre")}
+      </div>${fld("Description","settings.programme."+i+".desc","textarea")}`).join('<hr style="border-color:var(--line)">')}</div>`;
+}
+function renderCheikh(){
+  $('#pane-cheikh').innerHTML=`<div class="frm"><h3>Le Cheikh</h3>
+    ${photoFld("Photo","cheikh.photo","souvenirs/cheikh/")}
+    ${fld("Nom complet","cheikh.nom_complet")}
+    ${fld("Biographie","cheikh.biographie","textarea")}
+    ${fld("Adresse","cheikh.adresse")}</div>
+    <div class="frm"><h3>Citations / enseignements</h3>
+    ${D.cheikh.citations.map((c,i)=>fld("Citation "+(i+1),"cheikh.citations."+i,"textarea")).join('')}
+    <button class="abtn" data-add="citation">+ Ajouter une citation</button></div>`;
+}
+function personForm(base,i,p,isJak){
+  return `<div class="frm"><h3>${isJak?'Membre':'Dignitaire'} ${i+1}
+      <button class="del" data-del="${base}" data-i="${i}">✕ Supprimer</button></h3>
+    ${photoFld("Photo",base+"."+i+".photo",isJak?"souvenirs/membres/":"souvenirs/dignitaires/")}
+    <div class="grid2c">
+    ${fld("Nom complet",base+"."+i+".nom_complet")}
+    ${fld("Adresse",base+"."+i+".adresse")}
+    ${isJak?fld("Fonction",base+"."+i+".fonction"):''}
+    ${isJak?fld("Fondateur",base+"."+i+".fondateur","select",["OUI","NON"]):''}
+    </div>
+    ${fld("Biographie",base+"."+i+".biographie","textarea")}</div>`;
+}
+function renderDign(){
+  $('#pane-dignitaires').innerHTML=D.dignitaires.map((p,i)=>personForm('dignitaires',i,p,false)).join('')
+    +`<button class="abtn gold" data-add="dignitaire">+ Ajouter un dignitaire</button>`;
+}
+function renderJak(){
+  $('#pane-jak').innerHTML=D.jak.map((p,i)=>personForm('jak',i,p,true)).join('')
+    +`<button class="abtn gold" data-add="jak">+ Ajouter un membre</button>`;
+}
+function renderGal(){
+  $('#pane-galerie').innerHTML=D.galerie.map((g,i)=>`<div class="frm"><h3>Photo ${i+1}
+      <button class="del" data-del="galerie" data-i="${i}">✕ Supprimer</button></h3>
+    ${photoFld("Image","galerie."+i+".src","souvenirs/")}
+    ${fld("Légende","galerie."+i+".legende")}</div>`).join('')
+    +`<button class="abtn gold" data-add="galerie">+ Ajouter une photo</button>`;
+}
+function renderAll(){renderReglages();renderCheikh();renderDign();renderJak();renderGal();}
+renderAll();
+
+/* ---- events (délégation) ---- */
+document.body.addEventListener('input',e=>{
+  const p=e.target.dataset.path;
+  if(p)set(p,e.target.value);
+});
+document.body.addEventListener('change',e=>{
+  const ph=e.target.dataset.photo;
+  if(ph&&e.target.files&&e.target.files[0]){
+    const file=e.target.files[0];
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=700;const sc=Math.min(1,MAX/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas');
+      cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      const url=cv.toDataURL('image/jpeg',0.85);
+      set(ph,url);
+      const pane=e.target.closest('.pane');
+      pane.querySelector(`img[data-preview="${ph}"]`).src=url;
+      pane.querySelector(`input[type=text][data-path="${ph}"]`).value='(photo importée)'===''?'':url.slice(0,40)+'…';
+      pane.querySelector(`input[type=text][data-path="${ph}"]`).value=url;
+      msg('Photo importée et compressée');
+    };
+    img.src=URL.createObjectURL(file);
+  }
+});
+document.body.addEventListener('click',e=>{
+  const add=e.target.dataset.add, del=e.target.dataset.del;
+  if(add==='dignitaire'){D.dignitaires.push({photo:"",nom_complet:"",biographie:"",adresse:""});renderDign();}
+  if(add==='jak'){D.jak.push({photo:"",nom_complet:"",biographie:"",adresse:"",fondateur:"NON",fonction:""});renderJak();}
+  if(add==='galerie'){D.galerie.push({src:"",legende:""});renderGal();}
+  if(add==='citation'){D.cheikh.citations.push("");renderCheikh();}
+  if(del){
+    if(!confirm('Supprimer cet élément ?'))return;
+    D[del].splice(+e.target.dataset.i,1);
+    if(del==='dignitaires')renderDign();else if(del==='jak')renderJak();else renderGal();
+  }
+});
+
+/* ---- tabs ---- */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+t.dataset.p));
+}));
+
+/* ---- draft / export / reset ---- */
+$('#btnDraft').addEventListener('click',()=>{
+  try{localStorage.setItem('admin_draft',JSON.stringify(D));msg('Enregistré ✓ — visible sur le site de cet appareil');}
+  catch(e){msg('Erreur : stockage indisponible');}
+});
+$('#btnExport').addEventListener('click',()=>{
+  const head="/* =========================================================\n   DONNÉES DU SITE — Visite de Cheikh Ould Khaiïry 2026\n   Fichier généré par admin.html le "+new Date().toLocaleString('fr-FR')+"\n   ========================================================= */\n";
+  const js=head+"window.SITE_DATA="+JSON.stringify(D,null,2)+";\n";
+  const blob=new Blob([js],{type:'text/javascript;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='data.js';a.click();
+  try{localStorage.setItem('admin_draft',JSON.stringify(D));}catch(e){}
+  msg('data.js téléchargé — remplacez le fichier du site');
+});
+$('#btnReset').addEventListener('click',()=>{
+  if(!confirm('Abandonner le brouillon et revenir au contenu du fichier data.js actuel ?'))return;
+  try{localStorage.removeItem('admin_draft');}catch(e){}
+  D=JSON.parse(JSON.stringify(window.SITE_DATA));renderAll();msg('Réinitialisé');
+});
+
+window.__admin={getData:()=>D,set,get,renderAll};
+})();
+</script>
+</body>
+</html>
