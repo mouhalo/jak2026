@@ -26,6 +26,16 @@ nav.site a:hover{color:var(--ink);background:var(--panel-2)}
 nav.site a.on{color:#1a1408;background:var(--gold);font-weight:600}
 nav.site select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);
   border-radius:8px;padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+/* Sélecteur de langue à drapeaux (SVG inline) */
+.langsel{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.langbtn{display:inline-flex;align-items:center;gap:5px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:8px;padding:5px 8px;cursor:pointer;
+  color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.05em;line-height:1;min-height:36px}
+.langbtn .flag{width:20px;height:14px;border-radius:2px;flex:none;display:block;
+  box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.langbtn:hover{border-color:var(--gold);color:var(--ink)}
+.langbtn.on{border-color:var(--gold);background:var(--panel);color:var(--ink)}
 /* HERO */
 .hero{padding:52px 0 40px;text-align:center}
 .hero img.portrait{width:min(58vw,240px);aspect-ratio:482/495;height:auto;border-radius:20px;border:2px solid var(--gold);
