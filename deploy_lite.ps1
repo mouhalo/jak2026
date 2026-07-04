@@ -67,7 +67,7 @@ $remotePrefix = if ($remote) { "$remote/" } else { '' }
 
 # --- Fichiers à NE PAS déployer (identique à deploy.ps1 + le manifeste) ---
 $excludeNames = @('.env', 'deploy.ps1', 'deploy_lite.ps1', '.gitignore', 'data.json', '.deploy-manifest.json')
-$excludeDirs  = @('.git', 'node_modules', '.vscode', '.idea', 'state', '.superpowers', 'docs', 'tests', 'tools')
+$excludeDirs  = @('.git', 'node_modules', '.vscode', '.idea', 'state', '.superpowers', 'docs', 'tests', 'tools', 'db')
 
 $files = Get-ChildItem -Path $root -Recurse -File | Where-Object {
   $rel   = $_.FullName.Substring($root.Length).TrimStart('\', '/')
