@@ -77,6 +77,22 @@ window.SITE_LANG=()=>lang;
 
 document.addEventListener('contextmenu',e=>{if(e.target.closest('img,figure,.slide,.gal,.ph'))e.preventDefault();});
 document.addEventListener('dragstart',e=>{if(e.target&&e.target.tagName==='IMG')e.preventDefault();});
+
+/* Drapeaux SVG inline (rendu identique partout, y compris Windows). Wolof et
+   Pulaar (sans pays propre) partagent le drapeau du Sénégal, distingués par le code. */
+const FLAG={
+  fr:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="4" fill="#fff"/><rect width="2" height="4" fill="#0055A4"/><rect x="4" width="2" height="4" fill="#EF4135"/></svg>',
+  sn:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="2" height="4" fill="#00853F"/><rect x="2" width="2" height="4" fill="#FDEF42"/><rect x="4" width="2" height="4" fill="#E31B23"/><path d="M3 1.35l.221.68h.716l-.579.42.221.681L3 3.39l-.579.42.221-.68-.579-.42h.716z" fill="#00853F"/></svg>',
+  sa:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="4" fill="#006C35"/><rect x="1" y="2.7" width="4" height="0.25" rx=".12" fill="#fff"/></svg>',
+  gb:'<svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#C8102E" stroke-width="4"/><path d="M30,0V30M0,15H60" stroke="#fff" stroke-width="10"/><path d="M30,0V30M0,15H60" stroke="#C8102E" stroke-width="6"/></svg>'
+};
+const LANGMETA={
+  fr:{name:'Français',flag:FLAG.fr}, wo:{name:'Wolof',flag:FLAG.sn},
+  ar:{name:'العربية',flag:FLAG.sa}, ff:{name:'Pulaar',flag:FLAG.sn},
+  en:{name:'English',flag:FLAG.gb}
+};
+const LANGORDER=['fr','wo','ar','ff','en'];
+
 window.renderChrome=function(active){
   const S=window.SITE_DATA.settings;
   const nav=document.createElement('nav');nav.className='site';
@@ -88,16 +104,14 @@ window.renderChrome=function(active){
     <a href="jak.html" class="${active==='jak'?'on':''}">${T('nav_jak')}</a>
     <a href="galerie.html" class="${active==='galerie'?'on':''}">${T('nav_galerie')}</a>
     <a href="Mon_Acces_2026.html">${T('nav_acces')}</a>
-    <select id="langSel" aria-label="Langue">
-      <option value="fr">FR</option><option value="wo">WO</option><option value="ar">AR</option>
-      <option value="ff">FF</option><option value="en">EN</option>
-    </select></div>`;
+    <div class="langsel" role="group" aria-label="Langue">${LANGORDER.map(lg=>
+      `<button type="button" class="langbtn${lg===lang?' on':''}" data-lang="${lg}" aria-label="${LANGMETA[lg].name}" title="${LANGMETA[lg].name}">${LANGMETA[lg].flag}<span>${lg.toUpperCase()}</span></button>`
+    ).join('')}</div></div>`;
   document.body.prepend(nav);
-  const sel=nav.querySelector('#langSel');sel.value=lang;
-  sel.addEventListener('change',()=>{
-    try{localStorage.setItem('site_lang',sel.value);}catch(e){}
+  nav.querySelectorAll('.langbtn').forEach(b=>b.addEventListener('click',()=>{
+    try{localStorage.setItem('site_lang',b.dataset.lang);}catch(e){}
     location.reload();
-  });
+  }));
   const f=document.createElement('footer');f.className='site';
   f.innerHTML=`<img src="logo.png" alt="" onerror="this.style.display='none'"><br>
     ${S.event_nom} — ${S.dates_texte}<br>${T('footer')}`;
