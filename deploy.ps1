@@ -65,6 +65,7 @@ $files = Get-ChildItem -Path $root -Recurse -File | Where-Object {
   $parts = $rel -split '[\\/]'
   ($excludeNames -notcontains $_.Name) -and
   ($_.Extension -ne '.md') -and
+  ($_.Extension -ne '.ps1') -and
   (-not ($parts | Where-Object { $excludeDirs -contains $_ }))
 }
 
