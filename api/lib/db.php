@@ -162,11 +162,8 @@ function db_call_function(string $name, array $args, array $cfg): mixed {
     throw new InvalidArgumentException('Nom de fonction invalide : '.$name, 500);
   }
 
-  // Construction de la liste d'arguments SQL-safe (typage par valeur).
-  $sqlArgs = [];
-  foreach ($args as $a) {
-    $sqlArgs[] = db_quote($a);
-  }
+  // Construction de la liste d'arguments SQL-safe (db_quote ou db_raw).
+  $sqlArgs = _db_build_args($args);
   $sql = 'SELECT '.$name.'('.implode(', ', $sqlArgs).') AS data';
 
   $rows = db_query($sql, $cfg);
@@ -196,10 +193,7 @@ function db_call_row_function(string $name, array $args, array $cfg): ?array {
   if (!preg_match('/^[a-z_]+$/', $name)) {
     throw new InvalidArgumentException('Nom de fonction invalide : '.$name, 500);
   }
-  $sqlArgs = [];
-  foreach ($args as $a) {
-    $sqlArgs[] = db_quote($a);
-  }
+  $sqlArgs = _db_build_args($args);
   // row_to_json autour de l'appel → objet JSON propre.
   $sql = 'SELECT row_to_json('.$name.'('.implode(', ', $sqlArgs).')) AS data';
   $rows = db_query($sql, $cfg);
@@ -217,8 +211,12 @@ function db_call_row_function(string $name, array $args, array $cfg): ?array {
  *
  * - null      → NULL
  * - bool      → TRUE/FALSE
- * - int/float → littéral numérique
+ * - int/float → littéral numérique (integer)
  * - string    → quoté en '...' avec échappement '' (doubles apostrophes)
+ *
+ * ⚠ PostgreSQL coerce automatiquement integer→bigint (widening) mais REFUSE
+ * integer→smallint (narrowing). Pour les fonctions attendant un smallint
+ * (ex. site_data_json(p_evenement_id smallint)), utiliser db_cast().
  *
  * @param mixed $v
  * @return string
@@ -232,4 +230,56 @@ function db_quote(mixed $v): string {
   $s = str_replace(["\\", "\0"], ['\\\\', ''], (string)$v);
   $s = str_replace("'", "''", $s);
   return "'".$s."'";
+}
+
+/**
+ * Échappe une valeur ET applique un cast explicite vers un type PostgreSQL.
+ *
+ * Indispensable pour les arguments smallint (PostgreSQL ne coerce pas
+ * integer→smallint automatiquement), ou tout type où l'inférence est ambiguë.
+ *
+ * Retourne un fragment SQL BRUT (déjà échappé+casté) à passer tel quel dans
+ * le tableau $args de db_call_function : celui-ci détecte les fragments
+ * marqués (db_raw) et ne les re-quote pas.
+ *
+ * Exemples :
+ *   db_cast(1, 'smallint')         → fragment "1::smallint"
+ *   db_cast('+221...', 'varchar')  → fragment "'+221...'::varchar"
+ *
+ * @param mixed  $value
+ * @param string $type  Nom du type SQL cible (smallint, bigint, text, varchar, ...)
+ * @return array  Fragment SQL brut à passer dans $args (cf. db_raw).
+ */
+function db_cast(mixed $value, string $type): array {
+  return db_raw(db_quote($value).'::'.$type);
+}
+
+/**
+ * Encapsule un fragment SQL déjà formé pour qu'il ne soit PAS re-quoté par
+ * db_call_function. À utiliser pour les valeurs nécessitant un cast explicite
+ * (db_cast) ou toute expression SQL sûre contrôlée côté serveur.
+ *
+ *   db_call_function('site_data_json', [db_raw('1::smallint')], $cfg)
+ *
+ * @param string $sql  Fragment SQL déjà échappé/typé (JAMAIS de saisie client).
+ * @return array       Marqueur reconnu par db_call_function.
+ */
+function db_raw(string $sql): array {
+  return ['__raw__' => true, 'sql' => $sql];
+}
+
+/**
+ * Construit la liste d'arguments SQL-safe : db_quote pour les valeurs,
+ * passage direct pour les fragments db_raw (castés ou expressions).
+ */
+function _db_build_args(array $args): array {
+  $out = [];
+  foreach ($args as $a) {
+    if (is_array($a) && ($a['__raw__'] ?? false)) {
+      $out[] = $a['sql'];   // fragment déjà formé (cast, expression).
+    } else {
+      $out[] = db_quote($a);
+    }
+  }
+  return $out;
 }

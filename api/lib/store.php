@@ -26,7 +26,9 @@ require_once __DIR__.'/db.php';
  */
 function store_load(array $cfg): array {
   try {
-    $data = db_call_function('site_data_json', [1], $cfg);
+    // site_data_json(p_evenement_id smallint DEFAULT 1) — cast smallint requis
+    // car PostgreSQL ne coerce pas integer→smallint (narrowing interdit).
+    $data = db_call_function('site_data_json', [db_cast(1, 'smallint')], $cfg);
     return is_array($data) ? $data : [];
   } catch (Throwable $e) {
     // Mode dégradé : si la base est injoignable, on retombe sur data.json
@@ -93,11 +95,28 @@ function store_regenerate_datajs(array $cfg): void {
 
 /**
  * Écriture atomique d'un fichier (réutilisé par data.js et le cache data.json).
+ *
+ * Sous Linux, `rename(tmp, path)` est atomique et remplace la cible même si
+ * elle est ouverte. Sous Windows, `rename` échoue (code 5 « Accès refusé »)
+ * dès que le fichier cible est verrouillé par un autre processus (navigateur
+ * qui sert data.js, éditeur, antivirus). On retente donc quelques fois avec
+ * un court délai, puis on retombe sur un `file_put_contents(LOCK_EX)` direct
+ * (moins atomique mais robuste au verrou en écriture).
  */
 function _atomic_write(string $path, string $content): void {
   $tmp = $path.'.tmp'.getmypid();
   file_put_contents($tmp, $content, LOCK_EX);
-  rename($tmp, $path);
+  // Tentatives de rename atomique (jusqu'à ~1 s).
+  for ($i = 0; $i < 5; $i++) {
+    if (@rename($tmp, $path)) {
+      return;  // succès
+    }
+    usleep(200000);  // 0,2 s entre tentatives (laisser le verrou se libérer).
+  }
+  // Fallback Windows : écriture directe avec verrou exclusif. Le .tmp est
+  // ignoré (il sera écrasé au prochain appel). Moins atomique mais fiable.
+  @file_put_contents($path, $content, LOCK_EX);
+  @unlink($tmp);
 }
 
 /**
