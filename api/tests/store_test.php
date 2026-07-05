@@ -47,24 +47,33 @@ try {
   ok(false, 'store_regenerate_datajs a échoué : '.$e->getMessage());
 }
 
-// --- member_find_by_phone : E.164 ---
-try {
-  $m = member_find_by_phone($cfg, '+221REDACTED');
-  ok($m !== null, 'member_find_by_phone trouve le membre');
-  ok(($m['slug'] ?? '') === 'm-cheikh-mouhamed-lo', 'slug correct');
-  ok(($m['telephone'] ?? '') === '+221REDACTED', 'téléphone E.164');
-  ok(member_find_by_phone($cfg, '+221000000000') === null, 'numéro inconnu → null');
-} catch (Throwable $e) {
-  ok(false, 'member_find_by_phone a échoué : '.$e->getMessage());
-}
+// --- member_find_by_phone / member_find_by_id : lookup d'intégration ---
+// Les données de test (vrai numéro/slug/id d'un membre existant en base) sont
+// externalisées dans config.php (gitignoré) : AUCUN vrai numéro de membre n'est
+// committé dans le dépôt. Si la config de test est absente → skip explicite.
+$testPhone = $cfg['test_member_phone'] ?? '';
+$testSlug  = $cfg['test_member_slug'] ?? '';
+$testId    = $cfg['test_member_id']   ?? null;
+if ($testPhone === '' || $testSlug === '' || $testId === null) {
+  echo "  SKIP: member_find_by_phone/id — config de test absente (test_member_phone/slug/id dans config.php)\n";
+} else {
+  try {
+    $m = member_find_by_phone($cfg, $testPhone);
+    ok($m !== null, 'member_find_by_phone trouve le membre');
+    ok(($m['slug'] ?? '') === $testSlug, 'slug correct');
+    ok(($m['telephone'] ?? '') === $testPhone, 'téléphone E.164');
+    ok(member_find_by_phone($cfg, '+221000000000') === null, 'numéro inconnu → null');
+  } catch (Throwable $e) {
+    ok(false, 'member_find_by_phone a échoué : '.$e->getMessage());
+  }
 
-// --- member_find_by_id : bigint ---
-try {
-  $m = member_find_by_id($cfg, 25);
-  ok($m !== null && ($m['slug'] ?? '') === 'm-cheikh-mouhamed-lo', 'member_find_by_id(25) trouve le membre');
-  ok(member_find_by_id($cfg, -1) === null, 'id inexistant → null');
-} catch (Throwable $e) {
-  ok(false, 'member_find_by_id a échoué : '.$e->getMessage());
+  try {
+    $m = member_find_by_id($cfg, (int)$testId);
+    ok($m !== null && ($m['slug'] ?? '') === $testSlug, 'member_find_by_id trouve le membre');
+    ok(member_find_by_id($cfg, -1) === null, 'id inexistant → null');
+  } catch (Throwable $e) {
+    ok(false, 'member_find_by_id a échoué : '.$e->getMessage());
+  }
 }
 
 // --- member_to_front : projection pour auth.js ---

@@ -105,7 +105,10 @@ function store_regenerate_datajs(array $cfg): void {
  */
 function _atomic_write(string $path, string $content): void {
   $tmp = $path.'.tmp'.getmypid();
-  file_put_contents($tmp, $content, LOCK_EX);
+  if (file_put_contents($tmp, $content, LOCK_EX) === false) {
+    error_log('[jak-store] échec écriture fichier temporaire : '.$tmp);
+    return;  // on n'écrase pas la cible si le tmp n'a pas pu être écrit.
+  }
   // Tentatives de rename atomique (jusqu'à ~1 s).
   for ($i = 0; $i < 5; $i++) {
     if (@rename($tmp, $path)) {
@@ -115,7 +118,9 @@ function _atomic_write(string $path, string $content): void {
   }
   // Fallback Windows : écriture directe avec verrou exclusif. Le .tmp est
   // ignoré (il sera écrasé au prochain appel). Moins atomique mais fiable.
-  @file_put_contents($path, $content, LOCK_EX);
+  if (@file_put_contents($path, $content, LOCK_EX) === false) {
+    error_log('[jak-store] échec écriture directe (fallback) : '.$path);
+  }
   @unlink($tmp);
 }
 
@@ -123,7 +128,7 @@ function _atomic_write(string $path, string $content): void {
  * Recherche un membre par téléphone (depuis la base).
  *
  * @param array  $cfg
- * @param string $phone  Téléphone au format E.164 ('+221REDACTED')
+ * @param string $phone  Téléphone au format E.164 ('+221700000000')
  * @return array|null    Ligne personne (avec id bigint, slug, ...) ou null.
  */
 function member_find_by_phone(array $cfg, string $phone): ?array {

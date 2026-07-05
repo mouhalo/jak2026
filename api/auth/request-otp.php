@@ -50,7 +50,9 @@ if ($role === 'admin') {
   $code = otp_generate();
   $hash = otp_hash($code, $cfg);
   try {
-    $otpId = db_call_function('otp_creer', ['admin', $phoneIntl, null, $hash], $cfg);
+    // p_ttl_sec (integer) : durée de vie du défi issue de la config (pas de cast,
+    // la fonction attend un integer → littéral numérique accepté tel quel).
+    $otpId = db_call_function('otp_creer', ['admin', $phoneIntl, null, $hash, (int)($cfg['otp_ttl'] ?? 300)], $cfg);
   } catch (Throwable $e) {
     error_log('[jak-otp] otp_creer admin échec : '.$e->getMessage());
     json_out(['success'=>false,'message'=>'Envoi du code impossible pour le moment. Réessayez.'], 500);
@@ -87,7 +89,7 @@ $hash = otp_hash($code, $cfg);
 // Challenge posé MÊME sans membre (leurre non envoyé) : verify-otp se comporte
 // à l'identique (jamais 'none' pour un inconnu) → pas d'oracle d'énumération au verify.
 try {
-  $otpId = db_call_function('otp_creer', ['membre', $phoneIntl, $personneId, $hash], $cfg);
+  $otpId = db_call_function('otp_creer', ['membre', $phoneIntl, $personneId, $hash, (int)($cfg['otp_ttl'] ?? 300)], $cfg);
 } catch (Throwable $e) {
   error_log('[jak-otp] otp_creer membre échec : '.$e->getMessage());
   // On reste générique (anti-énumération) même en cas d'erreur DB.

@@ -39,9 +39,9 @@ function otp_hash(string $code, array $cfg): string {
  * pays configuré (défaut 221). Si déjà en E.164 (commence par +), on retourne
  * tel quel (chiffres uniquement recomposés avec +).
  *
- * @param string $input   Numéro saisi (ex: '77 730 12 21' ou '+221REDACTED')
+ * @param string $input   Numéro saisi (ex: '70 000 00 00' ou '+221700000000')
  * @param array  $cfg
- * @return string|null    E.164 '+221REDACTED' ou null si invalide
+ * @return string|null    E.164 '+221700000000' ou null si invalide
  */
 function otp_normalize_phone(string $input, array $cfg): ?string {
   $digits = preg_replace('/\D/', '', $input);

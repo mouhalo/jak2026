@@ -28,6 +28,26 @@ if (is_dir($file)) {
   }
 }
 
+// 2-bis. Déni explicite des chemins sensibles (reproduit l'esprit du .htaccess
+//    de prod). php -S sert TOUT fichier existant en direct, y compris les
+//    secrets (.env, data.json, config.php) et les libs PHP (jamais servies
+//    directement, seulement require'd). On bloque donc AVANT le service.
+//    Dev-only, mais évite une fuite en démo locale.
+$rel  = strtolower(ltrim($uri, '/'));
+$base = basename($rel);
+$denied =
+     $base === '.env'
+  || $base === 'data.json'
+  || $base === 'config.php'
+  || str_starts_with($rel, 'api/state/')
+  || preg_match('#^api/lib/.+\.php$#', $rel) === 1;
+if ($denied) {
+  http_response_code(403);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo '403 Forbidden';
+  return true;
+}
+
 // 3. Fichier existant (statique ou PHP) → laisser le serveur built-in le servir.
 //    php -S sert nativement les .php en les exécutant et les assets en direct.
 if (is_file($file)) {

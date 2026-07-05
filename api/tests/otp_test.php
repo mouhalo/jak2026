@@ -30,10 +30,11 @@ ok($h1 !== $h3, 'codes différents → hashes différents');
 ok(strlen($h1) === 64, 'hash HMAC-SHA256 = 64 hex');
 
 // otp_normalize_phone : 9 chiffres → E.164 avec indicatif configuré.
-eq(otp_normalize_phone('REDACTED', $cfg), '+221REDACTED', '9 chiffres → +221...');
-eq(otp_normalize_phone('77 730 12 21', $cfg), '+221REDACTED', 'espaces stripés');
-eq(otp_normalize_phone('+221REDACTED', $cfg), '+221REDACTED', 'E.164 préservé');
-eq(otp_normalize_phone('+33676551098', $cfg), '+33676551098', 'format FR préservé');
+// Numéros FACTICES (plage réservée 7000000xx) : aucun vrai numéro de membre committé.
+eq(otp_normalize_phone('700000000', $cfg), '+221700000000', '9 chiffres → +221...');
+eq(otp_normalize_phone('70 000 00 00', $cfg), '+221700000000', 'espaces stripés');
+eq(otp_normalize_phone('+221700000000', $cfg), '+221700000000', 'E.164 préservé');
+eq(otp_normalize_phone('+33600000000', $cfg), '+33600000000', 'format FR préservé');
 eq(otp_normalize_phone('123', $cfg), null, 'trop court → null');
 
 // otp_can_send : cooldown basé sur last_send.

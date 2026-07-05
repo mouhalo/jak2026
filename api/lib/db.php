@@ -156,10 +156,10 @@ function db_query(string $sql, array $cfg): array {
  * SÉCURITÉ :
  *  - $name DOIT figurer dans DB_ALLOWED_FUNCTIONS (sinon exception).
  *  - $args sont passés via db_quote() (échappement SQL-safe par typage).
- *  - Le nom est validé par regex (^[a-z_]+$) avant toute interpolation.
+ *  - Le nom est validé par regex (^[a-z0-9_]+$) avant toute interpolation.
  *
  * @param string $name  Nom de la fonction PL/pgSQL (ex. 'site_data_json')
- * @param array  $args  Arguments positionnels (ex. [1] ou ['+221REDACTED', 'hash'])
+ * @param array  $args  Arguments positionnels (ex. [1] ou ['+221700000000', 'hash'])
  * @param array  $cfg   Config app
  * @return mixed        Valeur retournée par la fonction (json/array/string/null)
  * @throws InvalidArgumentException  Si la fonction n'est pas whitelistée.
@@ -170,8 +170,9 @@ function db_call_function(string $name, array $args, array $cfg): mixed {
   if (!in_array($name, DB_ALLOWED_FUNCTIONS, true)) {
     throw new InvalidArgumentException('Fonction DB non autorisée : '.$name, 500);
   }
-  // Garde-fou : le nom doit être un identifiant SQL sûr (lettres + underscore).
-  if (!preg_match('/^[a-z_]+$/', $name)) {
+  // Garde-fou : le nom doit être un identifiant SQL sûr (lettres, chiffres,
+  // underscore) — anticipe les futurs noms versionnés type 'soutien_v2'.
+  if (!preg_match('/^[a-z0-9_]+$/', $name)) {
     throw new InvalidArgumentException('Nom de fonction invalide : '.$name, 500);
   }
 
@@ -203,7 +204,7 @@ function db_call_row_function(string $name, array $args, array $cfg): ?array {
   if (!in_array($name, DB_ALLOWED_FUNCTIONS, true)) {
     throw new InvalidArgumentException('Fonction DB non autorisée : '.$name, 500);
   }
-  if (!preg_match('/^[a-z_]+$/', $name)) {
+  if (!preg_match('/^[a-z0-9_]+$/', $name)) {
     throw new InvalidArgumentException('Nom de fonction invalide : '.$name, 500);
   }
   $sqlArgs = _db_build_args($args);
@@ -239,8 +240,12 @@ function db_quote(mixed $v): string {
   if (is_bool($v)) return $v ? 'TRUE' : 'FALSE';
   if (is_int($v) || is_float($v)) return (string)$v;
   // string : échappement PostgreSQL standard (doubles apostrophes).
-  // On retire aussi les null bytes par sécurité.
-  $s = str_replace(["\\", "\0"], ['\\\\', ''], (string)$v);
+  // La base tourne avec standard_conforming_strings=on (défaut PostgreSQL,
+  // vérifié empiriquement) : dans un littéral '...' l'antislash est LITTÉRAL,
+  // il ne faut donc PAS le doubler (le doubler corromprait les données en
+  // insérant un antislash parasite). Seule l'apostrophe doit être neutralisée
+  // (doublement ''). On retire aussi les null bytes par sécurité.
+  $s = str_replace("\0", '', (string)$v);
   $s = str_replace("'", "''", $s);
   return "'".$s."'";
 }

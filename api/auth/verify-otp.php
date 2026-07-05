@@ -32,7 +32,9 @@ if (!$otpId) {
 $submittedHash = otp_hash($code, $cfg);
 
 try {
-  $r = db_call_function('otp_verifier', [(int)$otpId, $submittedHash], $cfg);
+  // p_max_tentatives est un smallint : PostgreSQL REFUSE le narrowing
+  // integer→smallint, on caste donc explicitement (db_cast → '5'::smallint).
+  $r = db_call_function('otp_verifier', [(int)$otpId, $submittedHash, db_cast((int)($cfg['otp_max_try'] ?? 5), 'smallint')], $cfg);
 } catch (Throwable $e) {
   error_log('[jak-otp] otp_verifier échec : '.$e->getMessage());
   json_out(['success'=>false,'message'=>'Vérification impossible pour le moment. Réessayez.'], 500);
