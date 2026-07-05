@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Déploiement FTP INCRÉMENTAL du site JAK 2026 vers jak.sn : n'envoie que les
   fichiers nouveaux ou modifiés depuis le dernier déploiement.
@@ -66,7 +66,10 @@ foreach ($k in 'FTP_HOST', 'FTP_USER', 'FTP_PASS') {
 $remotePrefix = if ($remote) { "$remote/" } else { '' }
 
 # --- Fichiers à NE PAS déployer (identique à deploy.ps1 + le manifeste) ---
-$excludeNames = @('.env', 'deploy.ps1', 'deploy_lite.ps1', '.gitignore', 'data.json', '.deploy-manifest.json')
+# config.php (dev, purl_base=localhost) est EXCLU : on déploie config.prod.php
+# sous le nom config.php côté serveur (cf. étape de renommage plus bas).
+$excludeNames = @('.env', 'deploy.ps1', 'deploy_lite.ps1', '.gitignore', 'data.json',
+                  '.deploy-manifest.json', 'config.php')
 $excludeDirs  = @('.git', 'node_modules', '.vscode', '.idea', 'state', '.superpowers', 'docs', 'tests', 'tools', 'db')
 
 $files = Get-ChildItem -Path $root -Recurse -File | Where-Object {
@@ -105,9 +108,15 @@ foreach ($f in $files) {
   if ($known -and -not $Full) { $skip++; continue }
 
   $tag = if ($manifest.ContainsKey($rel)) { 'modifié' } else { 'nouveau' }
-  if ($DryRun) { Write-Host ("  [dry] {0}  ({1})" -f $rel, $tag) -ForegroundColor DarkGray; $sent++; continue }
+  # config.prod.php (local) → config.php (serveur) : renommage de cible pour
+  # déployer la version prod (purl_base=jak.sn) sous le nom attendu par le code.
+  $deployRel = if ($rel -eq 'api/lib/config.prod.php') { 'api/lib/config.php' } else { $rel }
+  if ($DryRun) {
+    $extra = if ($deployRel -ne $rel) { "  →  $deployRel" } else { '' }
+    Write-Host ("  [dry] {0}  ({1}){2}" -f $rel, $tag, $extra) -ForegroundColor DarkGray; $sent++; continue
+  }
 
-  $relUrl = (($rel -split '/') | ForEach-Object { [Uri]::EscapeDataString($_) }) -join '/'
+  $relUrl = (($deployRel -split '/') | ForEach-Object { [Uri]::EscapeDataString($_) }) -join '/'
   $url    = "ftp://$ftpHost`:$ftpPort/$remotePrefix$relUrl"
   $args   = @(
     '--silent', '--show-error', '--ftp-create-dirs', '--ftp-pasv',
@@ -120,7 +129,8 @@ foreach ($f in $files) {
 
   $out = & curl.exe @args 2>&1
   if ($LASTEXITCODE -eq 0) {
-    Write-Host ("  OK  {0}  ({1})" -f $rel, $tag) -ForegroundColor Green
+    $extra = if ($deployRel -ne $rel) { "  →  $deployRel" } else { '' }
+    Write-Host ("  OK  {0}  ({1}){2}" -f $rel, $tag, $extra) -ForegroundColor Green
     $manifest[$rel] = $hash   # mémorise le hash uniquement si l'envoi a réussi
     $sent++
   } else {

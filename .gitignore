@@ -11,6 +11,7 @@ Desktop.ini
 
 # Auth OTP — secrets & état serveur
 api/lib/config.php
+api/lib/config.prod.php
 data.json
 api/state/
 

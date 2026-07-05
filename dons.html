@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soutenir la visite du Cheikh — Jeunesse Al Khaïry 2026</title>
+<meta name="description" content="Soutenez l'organisation de la visite de Cheikh Ould Khaïry (CICES, Dakar, 16-18 juillet 2026). Contribution par Wave ou Orange Money.">
+<link rel="canonical" href="https://jak.sn/dons.html">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jeunesse Al Khaïry">
+<meta property="og:title" content="Soutenir la visite du Cheikh — Jeunesse Al Khaïry 2026">
+<meta property="og:description" content="Contribuez à l'organisation de la visite du Cheikh par Wave ou Orange Money.">
+<meta property="og:url" content="https://jak.sn/dons.html">
+<meta property="og:image" content="https://jak.sn/image_cheikh.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jak.sn/image_cheikh.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script src="auth.js"></script>
+<!-- dons.js = JS applicatif (no-cache : fetch live des soutiens + formulaire de don) -->
+<script src="dons.js"></script>
+</head>
+<body>
+<main>
+  <header class="hero wrap" style="padding-bottom:16px">
+    <img src="logo.png" alt="Logo JAK" style="height:90px;border-radius:14px;background:#fff;padding:8px"
+      onerror="this.style.display='none'">
+    <p class="eyebrow" id="pgEyebrow"></p>
+    <h1 id="donTitre"></h1>
+  </header>
+
+  <section><div class="wrap">
+    <div class="panel">
+      <p id="donIntro"></p>
+      <!-- Formulaire de don -->
+      <form class="don-form" id="donForm" autocomplete="off">
+        <div class="fld">
+          <label for="fMontant" id="lblMontant"></label>
+          <input id="fMontant" name="montant" type="number" inputmode="numeric"
+                 min="100" max="2000000" step="100" value="5000" required>
+        </div>
+        <div class="fld">
+          <span id="lblCanal"></span>
+          <div class="canal-row">
+            <label><input type="radio" name="canal" value="WAVE">
+              <img src="icone/wave.png" alt=""><span>Wave</span></label>
+            <label><input type="radio" name="canal" value="OM" checked>
+              <img src="icone/om.png" alt=""><span>Orange Money</span></label>
+          </div>
+        </div>
+        <div class="fld">
+          <label for="fTel" id="lblTel"></label>
+          <input id="fTel" name="telephone" type="tel" inputmode="numeric"
+                 maxlength="9" placeholder="77 123 45 67" required>
+        </div>
+        <div class="fld">
+          <label for="fNom" id="lblNom"></label>
+          <input id="fNom" name="nom" type="text" maxlength="120" placeholder="">
+          <p class="muted" style="font-size:12px;margin-top:3px" id="lblAnonyme"></p>
+        </div>
+        <button type="submit" class="cta" id="donSubmit" style="width:100%"></button>
+        <div class="don-msg" id="donMsg" style="display:none"></div>
+      </form>
+    </div>
+  </div></section>
+
+  <!-- Carrousel des soutiens reçus (fetch live via api/pay/liste.php) -->
+  <section><div class="wrap">
+    <h2 class="sec-label" id="secSoutiens"></h2>
+    <div class="soutiens-caro" id="soutiensCaro"></div>
+  </div></section>
+
+  <div id="soutienMount"></div>
+</main>
+<script>
+// L'IIFE est dans dons.js (chargé en haut). Ici on pose juste les IDs.
+</script>
+</body>
+</html>

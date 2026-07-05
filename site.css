@@ -240,3 +240,53 @@ footer.site img{height:30px;border-radius:6px;background:#fff;padding:2px;margin
   text-transform:uppercase;color:var(--muted);margin-top:6px}
 .authprev{max-width:120px;border-radius:12px;border:2px solid var(--gold);margin:6px 0}
 @media (prefers-reduced-motion: reduce){ .authov{backdrop-filter:none} }
+
+/* ============ CHANTIER 2 — PAGE DE DONS ============ */
+/* Formulaire de don — réutilise .panel / .cta / .authinp */
+.don-form{max-width:520px;margin:0 auto}
+.don-form .fld{margin:10px 0}
+.don-form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.don-form input,.don-form select{width:100%;padding:12px;border-radius:12px;
+  border:1px solid var(--line);background:var(--panel-2);color:var(--ink);font-size:15px}
+.don-form .canal-row{display:flex;gap:8px}
+.don-form .canal-row label{flex:1;display:flex;align-items:center;justify-content:center;
+  gap:6px;padding:10px;border-radius:12px;border:2px solid var(--line);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.03em;
+  text-transform:none;color:var(--ink)}
+.don-form .canal-row input{position:absolute;opacity:0;width:0;height:0}
+.don-form .canal-row input:checked + span,
+.don-form .canal-row label:has(input:checked){border-color:var(--gold);background:rgba(212,164,66,.12)}
+.don-form .canal-row img{width:20px;height:20px}
+.don-msg{margin-top:10px;padding:10px 14px;border-radius:10px;font-size:14px;text-align:center}
+.don-msg.ok{background:rgba(46,125,50,.12);color:var(--green);border:1px solid var(--green)}
+.don-msg.err{background:rgba(198,40,40,.12);color:var(--red);border:1px solid var(--red)}
+
+/* Carrousel des soutiens — réutilise .jcaro-stage/.jslide mais en cartes texte */
+.soutiens-caro{position:relative;padding:10px 0 4px;text-align:center;overflow:hidden;
+  min-height:120px}
+.soutiens-caro .sc-list{display:none}  /* liste statique (reduced-motion) */
+.soutien-card{border-radius:16px;padding:18px 16px;border:1px solid var(--line);
+  background:var(--panel-2);display:inline-flex;flex-direction:column;align-items:center;
+  gap:6px;min-width:min(72vw,300px)}
+.soutien-card .sc-num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;
+  letter-spacing:.04em;color:var(--ink)}
+.soutien-card .sc-nom{font-family:'Barlow Condensed',sans-serif;font-size:18px;
+  text-transform:uppercase;letter-spacing:.03em;color:var(--gold)}
+.soutien-card .sc-canal{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--muted)}
+.soutien-card .sc-canal img{width:16px;height:16px}
+.soutiens-caro .jslide{height:auto !important;width:min(80vw,320px) !important;
+  position:absolute;top:50%;left:50%}
+.soutiens-caro .jslide.cur{transform:translate(-50%,-50%) scale(1);opacity:1;z-index:3}
+.soutiens-caro .jslide.prev{transform:translate(-120%,-50%) scale(.7);opacity:.6;z-index:2}
+.soutiens-caro .jslide.next{transform:translate(20%,-50%) scale(.7);opacity:.6;z-index:2}
+.soutiens-caro .jdots{margin-top:10px}
+
+/* reduced-motion : fige le carrousel en liste statique (accessibilité PRD #8) */
+@media (prefers-reduced-motion: reduce){
+  .soutiens-caro .jcaro,.soutiens-caro .jarr{display:none}
+  .soutiens-caro .sc-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px}
+  .soutiens-caro .sc-list .soutien-card{position:static;transform:none;opacity:1;width:auto;
+    min-width:0}
+}

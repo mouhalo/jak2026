@@ -62,6 +62,19 @@ const DB_ALLOWED_FUNCTIONS = [
   'numero_contact_creer',
   'numero_contact_modifier',
   'numero_contact_supprimer',
+  // ═══ Chantier 2 — Dons (Wave / Orange Money) ═══
+  // Cloisonnement : create.php/liste.php sont publics (anonymes) ; les fonctions
+  // de confirmation (don_confirmer/don_echouer/don_attacher_uuid/soutien_upsert/
+  // journal_ajouter) ne sont appelées QUE par les endpoints serveur internes
+  // (retour.php, status.php, reconcile.php), jamais exposées directement au client.
+  'don_creer',          // public : create.php
+  'soutien_lister',     // public : liste.php (carrousel — ni montant ni tel clair)
+  'don_attacher_uuid',  // interne : create.php (après réponse pay_services)
+  'don_confirmer',      // interne : retour.php / status.php / reconcile.php (idempotent)
+  'don_echouer',        // interne : idem (idempotent)
+  'soutien_upsert',     // interne : appelé par don_confirmer via SQL
+  'journal_ajouter',    // interne : audit
+  'numero_mask',        // interne : masquage téléphone (utilisé par don_creer via SQL)
 ];
 
 /**
