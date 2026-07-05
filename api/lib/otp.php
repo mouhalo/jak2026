@@ -1,39 +1,69 @@
 <?php
+// =============================================================================
+//  otp.php — Helpers OTP (V2 / J1)
+// =============================================================================
+//  V1 : le défi était stocké en $_SESSION (hash, expire, tentatives, ...).
+//  V2 : le défi est persisté en BASE (table otp_defi) via otp_creer/otp_verifier
+//       (PL/pgSQL livrées par dba_master). Ce fichier ne garde que les helpers
+//       qui restent côté PHP :
+//         - otp_generate()  : code 6 chiffres
+//         - otp_hash()      : HMAC-SHA256 du code (le secret reste côté PHP,
+//                              la base ne reçoit JAMAIS le code en clair)
+//         - otp_normalize_phone() : 9 chiffres saisis → E.164 ('+221...')
+//         - otp_can_send()  : cooldown basé sur $_SESSION (lissage UX, non sécurité)
+//
+//  La logique de vérification (expiration, verrouillage, comparaison) est
+//  désormais en base (otp_verifier), qui reçoit les DEUX hashes.
+// =============================================================================
+
+/**
+ * Génère un code OTP à 6 chiffres.
+ */
 function otp_generate(): string {
   return str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 }
 
-function _otp_hash(string $code, array $cfg): string {
+/**
+ * Calcule le hash HMAC-SHA256 d'un code OTP.
+ * Le secret (otp_secret) reste côté PHP (config.php gitignoré) ; la base
+ * ne reçoit que ce hash, jamais le code en clair.
+ */
+function otp_hash(string $code, array $cfg): string {
   return hash_hmac('sha256', $code, $cfg['otp_secret']);
 }
 
+/**
+ * Normalise un numéro saisi (9 chiffres nus, format sénégalais) en E.164.
+ *
+ * Règle : on extrait les chiffres ; si 9 chiffres → on préfixe avec l'indicatif
+ * pays configuré (défaut 221). Si déjà en E.164 (commence par +), on retourne
+ * tel quel (chiffres uniquement recomposés avec +).
+ *
+ * @param string $input   Numéro saisi (ex: '77 730 12 21' ou '+221REDACTED')
+ * @param array  $cfg
+ * @return string|null    E.164 '+221REDACTED' ou null si invalide
+ */
+function otp_normalize_phone(string $input, array $cfg): ?string {
+  $digits = preg_replace('/\D/', '', $input);
+  if ($digits === '') return null;
+  $cc = $cfg['default_country_code'] ?? '221';
+  if (strlen($digits) === 9) {
+    return '+'.$cc.$digits;
+  }
+  // Déjà un format avec indicatif (10-15 chiffres) → on garde tel quel.
+  if (strlen($digits) >= 10 && strlen($digits) <= 15) {
+    return '+'.$digits;
+  }
+  return null;
+}
+
+/**
+ * Cooldown de renvoi (UX, non sécurité — le throttle fichier reste l'anti-abus).
+ * @param array $sess  Session OTP courante ({'last_send'=>int|null})
+ * @param int   $now   Timestamp courant
+ * @param array $cfg
+ */
 function otp_can_send(array $sess, int $now, array $cfg): bool {
   if (empty($sess['last_send'])) return true;
   return ($now - $sess['last_send']) >= $cfg['otp_resend'];
-}
-
-function otp_set_challenge(array &$sess, string $role, ?string $memberId, string $phone9, string $code, int $now, array $cfg): void {
-  $sess = [
-    'hash'      => _otp_hash($code, $cfg),
-    'role'      => $role,
-    'member_id' => $memberId,
-    'phone'     => $phone9,
-    'expire'    => $now + $cfg['otp_ttl'],
-    'attempts'  => 0,
-    'last_send' => $now,
-  ];
-}
-
-function otp_verify(array &$sess, string $input, int $now, array $cfg): array {
-  if (empty($sess['hash'])) return ['ok'=>false,'reason'=>'none','role'=>null,'member_id'=>null];
-  if ($now > $sess['expire']) { $sess = []; return ['ok'=>false,'reason'=>'expired','role'=>null,'member_id'=>null]; }
-  if ($sess['attempts'] >= $cfg['otp_max_try']) { $sess = []; return ['ok'=>false,'reason'=>'locked','role'=>null,'member_id'=>null]; }
-  $sess['attempts']++;
-  if (hash_equals($sess['hash'], _otp_hash($input, $cfg))) {
-    $role = $sess['role']; $mid = $sess['member_id'];
-    $sess = [];
-    return ['ok'=>true,'reason'=>'ok','role'=>$role,'member_id'=>$mid];
-  }
-  if ($sess['attempts'] >= $cfg['otp_max_try']) { $sess = []; return ['ok'=>false,'reason'=>'locked','role'=>null,'member_id'=>null]; }
-  return ['ok'=>false,'reason'=>'bad','role'=>null,'member_id'=>null];
 }

@@ -1,4 +1,16 @@
 <?php
+// =============================================================================
+//  validate.php — Validation des champs éditables d'une fiche membre (V2 / J1)
+// =============================================================================
+//  V1 : validait aussi le téléphone (unicité contre data['jak']).
+//  V2 : le téléphone d'IDENTITÉ vient de la session authentifiée (post-OTP),
+//       pas du body client. L'édition via save-fiche ne change PAS le numéro de
+//       login (le cloisonnement membre_sauver_fiche repose sur id+tel fixes).
+//       On ne valide donc plus le téléphone ici : tout champ 'telephone' du body
+//       est ignoré pour la sauvegarde (la fiche affiche le tel de session).
+//
+//  Restent validés : nom_complet, adresse, biographie (longueurs), photo (format).
+// =============================================================================
 function validate_member_fields(array $in, array $data, string $selfId): array {
   $errors = []; $fields = [];
   $limits = ['nom_complet'=>120, 'adresse'=>160, 'biographie'=>2000];
@@ -11,20 +23,8 @@ function validate_member_fields(array $in, array $data, string $selfId): array {
     }
   }
 
-  if (array_key_exists('telephone', $in)) {
-    $t = preg_replace('/\D/', '', (string)$in['telephone']);
-    if (!preg_match('/^\d{9}$/', $t)) {
-      $errors[] = 'telephone:9 chiffres attendus';
-    } else {
-      foreach (($data['jak'] ?? []) as $m) {
-        if (($m['id'] ?? '') !== $selfId && ($m['telephone'] ?? '') === $t) {
-          $errors[] = 'telephone:déjà utilisé par un autre membre';
-          break;
-        }
-      }
-      if (!in_array('telephone:déjà utilisé par un autre membre', $errors, true)) $fields['telephone'] = $t;
-    }
-  }
+  // Le téléphone du body est ignoré en V2 (l'identité = session post-OTP).
+  // On ne le valide ni ne l'enregistre via ce flux.
 
   if (array_key_exists('photo', $in)) {
     $p = (string)$in['photo'];

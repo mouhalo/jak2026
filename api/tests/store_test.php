@@ -1,40 +1,88 @@
 <?php
+// =============================================================================
+//  store_test.php — Tests store + projection data.js (V2 / J1)
+// =============================================================================
+//  V1 : testait store_save/store_load sur fichiers + member_find_by_phone
+//       depuis le tableau data en mémoire.
+//  V2 : la source canonique est la base. On teste :
+//       - store_load() lit la base (site_data_json) avec les 5 clés attendues
+//       - store_regenerate_datajs() produit un data.js SANS id/telephone
+//       - member_find_by_phone() / member_find_by_id() via la base (row_to_json)
+//       - member_to_front() projette une ligne personne pour le front
+//
+//  Exécution :
+//    C:\php\php.exe api\tests\store_test.php
+// =============================================================================
 require __DIR__.'/_assert.php';
+require __DIR__.'/../lib/config.php';
+require __DIR__.'/../lib/db.php';
 require __DIR__.'/../lib/store.php';
+$cfg = require __DIR__.'/../lib/config.php';
+// data.js dans un tmp pour ne pas écraser l'asset du projet pendant le test.
+$cfg['datajs_path'] = sys_get_temp_dir().'/jak_store_test_'.uniqid().'.js';
 
-$tmp = sys_get_temp_dir().'/jak_test_'.uniqid();
-$cfg = ['data_path'=>$tmp.'.json', 'datajs_path'=>$tmp.'.js'];
-$data = ['settings'=>['x'=>1], 'jak'=>[
-  ['id'=>'m-a','telephone'=>'770000001','nom_complet'=>'A','biographie'=>'ba','adresse'=>'aa','photo'=>'p1','fondateur'=>'NON','fonction'=>''],
-  ['id'=>'m-b','telephone'=>'770000002','nom_complet'=>'B','biographie'=>'bb','adresse'=>'ab','photo'=>'p2','fondateur'=>'OUI','fonction'=>'Prés'],
-]];
+// --- store_load : lit la base, 5 clés attendues ---
+try {
+  $data = store_load($cfg);
+  ok(is_array($data) && isset($data['jak']), 'store_load retourne un tableau avec jak');
+  $expected = ['settings', 'cheikh', 'dignitaires', 'jak', 'galerie'];
+  $missing = array_diff($expected, array_keys($data));
+  ok(!$missing, 'store_load contient les 5 clés (manquantes: '.implode(',', $missing).')');
+  ok(count($data['jak']) > 0, 'jak contient des membres');
+} catch (Throwable $e) {
+  ok(false, 'store_load a échoué : '.$e->getMessage());
+}
 
-store_save($cfg, $data);
-ok(is_file($cfg['data_path']), 'data.json écrit');
-ok(is_file($cfg['datajs_path']), 'data.js régénéré');
-$js = file_get_contents($cfg['datajs_path']);
-ok(str_starts_with($js,'window.SITE_DATA='), 'data.js commence par window.SITE_DATA=');
-ok(str_ends_with(trim($js),';'), 'data.js finit par ;');
+// --- store_regenerate_datajs : projection sans id/telephone ---
+try {
+  store_regenerate_datajs($cfg);
+  $js = file_get_contents($cfg['datajs_path']);
+  ok(str_starts_with($js, 'window.SITE_DATA='), 'data.js commence par window.SITE_DATA=');
+  ok(str_ends_with(trim($js), ';'), 'data.js finit par ;');
+  // Aucun téléphone (E.164) dans l'asset public.
+  ok(preg_match('/\+221\d{9}|\+33\d{9}/', $js) === 0, 'data.js public SANS téléphone');
+  // Aucun slug membre m-xxx.
+  ok(preg_match('/m-[a-z]/', $js) === 0, 'data.js public SANS id membre (slug)');
+} catch (Throwable $e) {
+  ok(false, 'store_regenerate_datajs a échoué : '.$e->getMessage());
+}
 
-$reloaded = store_load($cfg);
-eq($reloaded['settings']['x'], 1, 'store_load relit settings');
+// --- member_find_by_phone : E.164 ---
+try {
+  $m = member_find_by_phone($cfg, '+221REDACTED');
+  ok($m !== null, 'member_find_by_phone trouve le membre');
+  ok(($m['slug'] ?? '') === 'm-cheikh-mouhamed-lo', 'slug correct');
+  ok(($m['telephone'] ?? '') === '+221REDACTED', 'téléphone E.164');
+  ok(member_find_by_phone($cfg, '+221000000000') === null, 'numéro inconnu → null');
+} catch (Throwable $e) {
+  ok(false, 'member_find_by_phone a échoué : '.$e->getMessage());
+}
 
-$m = member_find_by_phone($data, '770000002');
-eq($m['id'], 'm-b', 'find_by_phone trouve m-b');
-eq(member_find_by_phone($data, '999999999'), null, 'find_by_phone inconnu = null');
-eq(member_find_by_id($data,'m-a')['nom_complet'], 'A', 'find_by_id trouve A');
+// --- member_find_by_id : bigint ---
+try {
+  $m = member_find_by_id($cfg, 25);
+  ok($m !== null && ($m['slug'] ?? '') === 'm-cheikh-mouhamed-lo', 'member_find_by_id(25) trouve le membre');
+  ok(member_find_by_id($cfg, -1) === null, 'id inexistant → null');
+} catch (Throwable $e) {
+  ok(false, 'member_find_by_id a échoué : '.$e->getMessage());
+}
 
-$okUpd = member_apply_update($data, 'm-a', ['nom_complet'=>'AA','telephone'=>'770000009','adresse'=>'x','biographie'=>'y','photo'=>'z']);
-ok($okUpd===true, 'update renvoie true');
-eq($data['jak'][0]['nom_complet'], 'AA', 'nom mis à jour');
-eq($data['jak'][0]['telephone'], '770000009', 'téléphone mis à jour');
-eq($data['jak'][0]['id'], 'm-a', 'id inchangé');
-ok(member_apply_update($data,'inconnu',[])===false, 'update id inconnu = false');
+// --- member_to_front : projection pour auth.js ---
+$p = ['slug'=>'m-test', 'url_photo'=>'img.png', 'nom_complet'=>'Test', 'adresse'=>'Dakar', 'telephone'=>'+221777000000', 'biographie'=>'bio', 'fonction'=>'Membre', 'fondateur'=>true];
+$f = member_to_front($p);
+eq($f['id'], 'm-test', 'member_to_front: id = slug');
+eq($f['photo'], 'img.png', 'member_to_front: url_photo → photo');
+eq($f['telephone'], '+221777000000', 'member_to_front: telephone conservé (pour pré-remplir le form)');
 
-$js = file_get_contents($cfg['datajs_path']);
-ok(strpos($js,'770000001')===false && strpos($js,'m-a')===false, 'data.js public ne contient ni telephone ni id');
-$jsonRaw = file_get_contents($cfg['data_path']);
-ok(strpos($jsonRaw,'770000001')!==false && strpos($jsonRaw,'m-a')!==false, 'data.json canonique contient bien telephone et id');
+// --- Whitelist : rejet fonction non autorisée ---
+try {
+  db_call_function('fonction_bidon_inexistante', [1], $cfg);
+  ok(false, 'whitelist aurait dû rejeter fonction_bidon_inexistante');
+} catch (InvalidArgumentException $e) {
+  ok(true, 'whitelist rejette fonction hors liste');
+} catch (Throwable $e) {
+  ok(false, 'mauvaise exception : '.get_class($e));
+}
 
-@unlink($cfg['data_path']); @unlink($cfg['datajs_path']);
+@unlink($cfg['datajs_path']);
 done();
