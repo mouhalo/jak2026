@@ -120,21 +120,56 @@ if (!$ps['ok']) {
     json_out(['success'=>false, 'message'=>$msg, 'canal'=>$canal], 502);
 }
 
-// --- 5. Succès : on attache l'uuid au don (idempotent) -------------------
+// --- 5. Succès : on attache l'uuid au don (FIABLE, avec retries) ---------
+// L'uuid est la clé de TOUTE confirmation ultérieure : status.php, retour.php
+// ET reconcile.php sont keyés par uuid. S'il n'est pas stocké, le don devient
+// INCONFIRMABLE quel que soit le chemin (paiement potentiellement débité, aucune
+// reprise possible car pay_services n'expose pas de lookup par référence). On ne
+// laisse donc JAMAIS passer un don orphelin : on valide, on réessaie, et à défaut
+// on refuse la demande (MAJ-001).
+$uuid = (string)$ps['uuid'];
+
+// Validation stricte du format UUID canonique : un uuid mal formé ferait échouer
+// db_cast(...,'uuid') à CHAQUE appel de confirmation → don définitivement bloqué.
+if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $uuid)) {
+    error_log('[jak-pay] create: uuid pay_services mal formé, don '.$donId.' : '.$uuid);
+    try {
+        db_call_function('don_echouer', [$donId, null, 'uuid pay_services invalide'], $cfg);
+    } catch (Throwable $e) {
+        error_log('[jak-pay] don_echouer (uuid invalide) échec : '.$e->getMessage());
+    }
+    json_out(['success'=>false,
+              'message'=>'Erreur technique du service de paiement. Réessayez.'], 502);
+}
+
+// Attache idempotente avec retries (absorbe une indispo DB transitoire).
 // ⚠ cast uuid explicite : PostgreSQL ne coerce pas text→uuid automatiquement.
-try {
-    db_call_function('don_attacher_uuid',
-        [$donId, db_cast($ps['uuid'], 'uuid')], $cfg);
-} catch (Throwable $e) {
-    // Non fatal : l'uuid est aussi porté par pay_services. On log et on continue
-    // (le don existe, la transaction est en cours côté opérateur).
-    error_log('[jak-pay] don_attacher_uuid échec (non fatal) : '.$e->getMessage());
+$attached = false;
+for ($try = 1; $try <= 3; $try++) {
+    try {
+        db_call_function('don_attacher_uuid', [$donId, db_cast($uuid, 'uuid')], $cfg);
+        $attached = true;
+        break;
+    } catch (Throwable $e) {
+        error_log('[jak-pay] don_attacher_uuid tentative '.$try.'/3 (don '.$donId.') : '
+            .$e->getMessage());
+    }
+}
+
+// Échec persistant → on REFUSE plutôt que de créer un don orphelin inconfirmable.
+// Le don reste en_attente sans uuid (il vieillira hors de la fenêtre reconcile) ;
+// l'utilisateur réessaie et obtient une transaction saine.
+if (!$attached) {
+    error_log('[jak-pay] CRITIQUE: uuid '.$uuid.' NON attaché au don '.$donId
+        .' (orphelin évité, demande refusée)');
+    json_out(['success'=>false,
+              'message'=>'Impossible de finaliser la demande de paiement. Réessayez.'], 502);
 }
 
 // --- 6. Réponse au navigateur --------------------------------------------
 json_out([
     'success'     => true,
-    'uuid'        => $ps['uuid'],
+    'uuid'        => $uuid,
     'canal'       => $canal,
     'payment_url' => $ps['payment_url'] ?? null,
     'om'          => $ps['om'] ?? null,

@@ -92,7 +92,7 @@ function showPayZone(r, canal){
   const qr = r.qrCode ? `<div class="pay-qr"><img src="data:image/png;base64,${esc(r.qrCode)}" alt="QR code ${esc(canal)}"></div>` : '';
   const link = r.payment_url || r.om || r.maxit || null;  // Wave=payment_url, OM=om/maxit
   const linkLabel = canal==='OM' ? '📱 Ouvrir Orange Money' : '📱 Ouvrir Wave';
-  const btn = link ? `<button type="button" class="cta" onclick="window.open('${esc(link)}','_blank','noopener')">${linkLabel}</button>` : '';
+  const btn = link ? `<button type="button" class="cta" id="payOpenBtn">${linkLabel}</button>` : '';
   const noQr = !r.qrCode && !link;
   zone.innerHTML = `
     ${qr}
@@ -103,6 +103,13 @@ function showPayZone(r, canal){
       <button type="button" class="cta ghost" onclick="razDon()">↺ ${T('don_nouveau')}</button>
     </div>
     ${noQr ? `<div class="pay-statut err">${T('don_echec')}</div>` : ''}`;
+  // Ouverture du lien de paiement via un handler JS : le lien vient d'un tiers
+  // (OFMS/INTOUCH) et esc() n'échappe PAS l'apostrophe → on ne l'interpole jamais
+  // dans du HTML/JS inline (MIN-001). `link` reste une variable, en closure.
+  if(link){
+    const ob=$('#payOpenBtn');
+    if(ob){ob.addEventListener('click',()=>window.open(link,'_blank','noopener'));}
+  }
   zone.style.display='flex';
   // Scroll doux vers la zone.
   zone.scrollIntoView({behavior:'smooth',block:'center'});
