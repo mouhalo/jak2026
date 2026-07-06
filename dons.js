@@ -38,6 +38,13 @@ function init(){
   // Carrousel + rattrapage (best-effort)
   loadSoutiens();
   api('api/pay/reconcile.php').catch(()=>{});  // déclenche le fallback throttlé
+  // Reprise d'un paiement en cours : au chargement (onglet rouvert/rechargé) ET
+  // au retour d'onglet (visibilitychange → visible), cas dominant sur mobile où
+  // l'onglet reste ouvert en arrière-plan pendant le passage à l'app wallet.
+  resumePendingIfAny();
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState==='visible') resumePendingIfAny();
+  });
 }
 
 /* Met à jour l'indication du canal choisi (icône + nom + hint).
@@ -72,93 +79,232 @@ async function submitDon(e){
     body:JSON.stringify({montant,canal,telephone,nom})});
   btn.disabled=false;
   if(!r.success){showMsg('err',r.message||T('don_echec'));return;}
-  // Succès : on affiche la zone de paiement (QR + bouton) sous le formulaire.
-  // Pas de redirection auto : l'utilisateur scanne le QR ou clique le bouton.
-  // Le polling détecte le paiement en arrière-plan et met à jour le statut.
-  showPayZone(r, canal);
-  if(r.uuid){pollStatut(r.uuid);}
+  const msgEl=$('#donMsg'); if(msgEl){msgEl.style.display='none';}
+  // Succès : on PERSISTE le paiement en cours (localStorage) puis on ouvre le
+  // modal bloquant. La persistance permet de REPRENDRE l'affichage du statut si
+  // l'utilisateur quitte l'onglet vers l'app wallet (Wave/OM) et revient — le
+  // navigateur retrouve le uuid + QR + liens sans jamais rappeler create.php.
+  const now=Date.now();
+  const pending={
+    uuid:r.uuid, canal, montant,
+    qrCode:r.qrCode||null,
+    payment_url:r.payment_url||null, om:r.om||null, maxit:r.maxit||null,
+    ts:now, deadline:now+WINDOW_MS
+  };
+  savePending(pending);
+  openPayModal(pending,{resumed:false});
 }
 
-/* ---- Zone de paiement (QR + boutons) affichée sous le formulaire ---- */
-function showPayZone(r, canal){
-  // Retire un éventuel message d'attente, on passe en zone dédiée.
-  const msg=$('#donMsg'); if(msg){msg.style.display='none';}
-  let zone=$('#payZone');
-  if(!zone){
-    zone=document.createElement('div');zone.id='payZone';zone.className='pay-zone';
-    // Insérée juste après le formulaire, dans le même .panel.
-    const form=$('#donForm'); form.insertAdjacentElement('afterend',zone);
+/* ---- Persistance du paiement en cours (localStorage) ----
+ * Une seule note à la fois (clé PEND_KEY). Tolérant aux erreurs (mode privé,
+ * quota, localStorage indisponible → no-op silencieux). */
+const PEND_KEY='jak_don_pending';
+const WINDOW_MS=180000;     // 3 min : fenêtre de paiement (= durée de polling)
+const TTL_MS=1800000;       // 30 min : TTL dur (ne jamais ressusciter un vieux don)
+const POLL_INTERVAL_MS=3000;
+function savePending(o){ try{ localStorage.setItem(PEND_KEY, JSON.stringify(o)); }catch(_){ } }
+function loadPending(){ try{ const s=localStorage.getItem(PEND_KEY); return s?JSON.parse(s):null; }catch(_){ return null; } }
+function clearPending(){ try{ localStorage.removeItem(PEND_KEY); }catch(_){ } }
+
+/* ---- État du modal de paiement (module) ---- */
+let _cur=null;        // paiement en cours affiché {uuid,canal,montant,qrCode,...,deadline}
+let _poll=null;       // handle setInterval du polling (unique)
+let _tick=null;       // handle setInterval du compte à rebours
+let _modalOpen=false; // garde d'idempotence (évite double ouverture / double poll)
+
+/* Liens de paiement à proposer selon le canal.
+ * OM → bouton Orange Money (om) + bouton Maxit (maxit) si distinct.
+ * WAVE → bouton lien de paiement (payment_url). */
+function payLinks(d){
+  const out=[];
+  if(d.canal==='WAVE'){
+    if(d.payment_url) out.push({label:T('don_ouvrir_wave'), url:d.payment_url});
+  }else{ // OM
+    if(d.om)                       out.push({label:T('don_ouvrir_om'),    url:d.om});
+    if(d.maxit && d.maxit!==d.om)  out.push({label:T('don_ouvrir_maxit'), url:d.maxit});
   }
-  const qr = r.qrCode ? `<div class="pay-qr"><img src="data:image/png;base64,${esc(r.qrCode)}" alt="QR code ${esc(canal)}"></div>` : '';
-  const link = r.payment_url || r.om || r.maxit || null;  // Wave=payment_url, OM=om/maxit
-  const linkLabel = canal==='OM' ? '📱 Ouvrir Orange Money' : '📱 Ouvrir Wave';
-  const btn = link ? `<button type="button" class="cta" id="payOpenBtn">${linkLabel}</button>` : '';
-  const noQr = !r.qrCode && !link;
-  zone.innerHTML = `
-    ${qr}
-    <div class="pay-acts">
-      <div class="pay-hint">${esc(canal)} · ${T('don_payez_hint')}</div>
-      ${btn}
-      <div class="pay-statut wait" id="payStatut">${T('don_en_cours')}</div>
-      <button type="button" class="cta ghost" onclick="razDon()">↺ ${T('don_nouveau')}</button>
-    </div>
-    ${noQr ? `<div class="pay-statut err">${T('don_echec')}</div>` : ''}`;
-  // Ouverture du lien de paiement via un handler JS : le lien vient d'un tiers
-  // (OFMS/INTOUCH) et esc() n'échappe PAS l'apostrophe → on ne l'interpole jamais
-  // dans du HTML/JS inline (MIN-001). `link` reste une variable, en closure.
-  if(link){
-    const ob=$('#payOpenBtn');
-    if(ob){ob.addEventListener('click',()=>window.open(link,'_blank','noopener'));}
+  // Repli : canal sans lien dédié mais payment_url présent.
+  if(!out.length && d.payment_url){
+    out.push({label:T(d.canal==='WAVE'?'don_ouvrir_wave':'don_ouvrir_om'), url:d.payment_url});
   }
-  zone.style.display='flex';
-  // Scroll doux vers la zone.
-  zone.scrollIntoView({behavior:'smooth',block:'center'});
+  return out;
 }
 
-/* Réinitialise le formulaire + retire la zone de paiement (nouveau don). */
+/* ---- Modal bloquant « Paiement en cours » ----
+ * Reste bloquant (pas de croix, pas de clic overlay) TANT QUE le polling est
+ * actif. Contient : QR, boutons d'ouverture wallet, compte à rebours, statut.
+ * À l'expiration du délai → devient fermable + bouton « J'ai payé / Vérifier ».
+ * opts.resumed=true : reprise (l'état du timer est recalculé depuis deadline). */
+function openPayModal(d, opts){
+  opts=opts||{};
+  if(_modalOpen) return;   // idempotent : déjà ouvert (reload + visibilitychange)
+  _modalOpen=true; _cur=d;
+  let ov=$('#payModal');
+  if(!ov){
+    ov=document.createElement('div'); ov.className='pay-modal'; ov.id='payModal';
+    ov.innerHTML=`<div class="pm-card">
+      <button type="button" class="pm-close" aria-label="${esc(T('fermer'))}">✕</button>
+      <h3 class="pm-titre"></h3>
+      <div class="pm-timer"></div>
+      <div class="pm-qr"></div>
+      <div class="pm-hint"></div>
+      <div class="pm-acts"></div>
+      <div class="pm-statut wait"></div>
+    </div>`;
+    document.body.appendChild(ov);
+    ov.querySelector('.pm-close').addEventListener('click', closePayModal);
+  }
+  ov.classList.remove('expired','done');
+  ov.querySelector('.pm-titre').textContent=T('don_modal_titre');
+  const tim=ov.querySelector('.pm-timer'); tim.style.display='';
+  // QR (base64 PNG). Pas d'apostrophe possible dans du base64 → interpolation sûre.
+  const qrEl=ov.querySelector('.pm-qr');
+  qrEl.innerHTML = d.qrCode ? `<img src="data:image/png;base64,${esc(d.qrCode)}" alt="QR ${esc(d.canal)}">` : '';
+  ov.querySelector('.pm-hint').textContent=d.canal+' · '+T('don_payez_hint');
+  // Boutons wallet : construits en DOM, lien capturé en closure (jamais interpolé
+  // en HTML inline car esc() n'échappe pas l'apostrophe — cf. MIN-001).
+  const acts=ov.querySelector('.pm-acts'); acts.innerHTML='';
+  payLinks(d).forEach(l=>{
+    const b=document.createElement('button'); b.type='button'; b.className='cta';
+    b.textContent='📱 '+l.label;
+    b.addEventListener('click',()=>window.open(l.url,'_blank','noopener'));
+    acts.appendChild(b);
+  });
+  setPayStatut('wait', T('don_en_cours'));
+  ov.classList.add('on');
+  startTimer();
+  startPoll();
+}
+
+/* Ferme le modal (uniquement possible en état fermable : expiré ou terminal).
+ * La fermeture explicite efface la note : l'utilisateur a fini avec ce paiement. */
+function closePayModal(){
+  const ov=$('#payModal'); if(ov) ov.classList.remove('on');
+  stopPoll(); clearInterval(_tick); _tick=null;
+  _modalOpen=false; _cur=null;
+  clearPending();
+}
+window.closePayModal=closePayModal;
+
+/* Compte à rebours (délai de paiement). À 0 → onTimeout(). */
+function startTimer(){
+  clearInterval(_tick);
+  const paint=()=>{
+    const el=document.querySelector('#payModal .pm-timer'); if(!el||!_cur)return;
+    const ms=_cur.deadline-Date.now();
+    if(ms<=0){ el.textContent='00:00'; clearInterval(_tick); _tick=null; onTimeout(); return; }
+    const s=Math.ceil(ms/1000), m=Math.floor(s/60), ss=s%60;
+    const pad=n=>String(n).padStart(2,'0');
+    el.textContent=T('don_modal_delai')+' '+pad(m)+':'+pad(ss);
+  };
+  paint();
+  _tick=setInterval(paint,1000);
+}
+
+/* Polling du statut, borné par la deadline. Handle unique (_poll) : si un poll
+ * tourne déjà (onglet resté ouvert + visibilitychange), on ne relance pas. */
+function startPoll(){
+  if(_poll||!_cur) return;
+  if(Date.now()>=_cur.deadline) return;   // déjà expiré → pas de polling
+  _poll=setInterval(async()=>{
+    if(!_cur||Date.now()>=_cur.deadline){ stopPoll(); return; }
+    const r=await api('api/pay/status.php?uuid='+encodeURIComponent(_cur.uuid));
+    if(r&&r.success&&r.statut==='confirme') onConfirmed();
+    else if(r&&r.statut==='echoue') onFailed();
+    // 'en_attente' (PENDING/PROCESSING) → on continue.
+  }, POLL_INTERVAL_MS);
+}
+function stopPoll(){ if(_poll){ clearInterval(_poll); _poll=null; } }
+
+/* Vérification unique à la demande (bouton « J'ai payé / Vérifier »). */
+async function checkOnce(){
+  if(!_cur) return;
+  setPayStatut('wait', T('don_verification'));
+  const r=await api('api/pay/status.php?uuid='+encodeURIComponent(_cur.uuid));
+  if(r&&r.success&&r.statut==='confirme') onConfirmed();
+  else if(r&&r.statut==='echoue') onFailed();
+  else setPayStatut('wait', T('don_verification'));
+}
+
+/* Transitions terminales (idempotentes). */
+function onConfirmed(){
+  stopPoll(); clearInterval(_tick); _tick=null; clearPending();
+  markTerminal('ok');
+  loadSoutiens();  // rafraîchit le carrousel des soutiens
+}
+function onFailed(){
+  stopPoll(); clearInterval(_tick); _tick=null; clearPending();
+  markTerminal('err');
+}
+
+/* Délai dépassé sans statut terminal : surtout NE PAS affirmer un échec
+ * (reconcile.php rattrapera). Modal fermable + bouton « J'ai payé / Vérifier ».
+ * La note localStorage reste tant que l'utilisateur ne ferme pas (le bouton
+ * Vérifier en a besoin). */
+function onTimeout(){
+  stopPoll();
+  const ov=$('#payModal'); if(!ov)return;
+  ov.classList.add('expired');   // révèle la croix de fermeture (CSS)
+  const t=ov.querySelector('.pm-titre'); if(t) t.textContent=T('don_delai_depasse');
+  setPayStatut('wait', T('don_verification'));
+  const acts=ov.querySelector('.pm-acts');
+  if(acts && !acts.querySelector('.pm-verify')){
+    const vb=document.createElement('button'); vb.type='button'; vb.className='cta pm-verify';
+    vb.textContent='✅ '+T('don_jai_paye');
+    vb.addEventListener('click', checkOnce);
+    acts.insertBefore(vb, acts.firstChild);
+  }
+}
+
+/* État terminal (confirmé/échoué) : le titre porte l'issue, le QR / le hint /
+ * le timer / le statut d'attente n'ont plus de sens → masqués (sinon un titre
+ * « Paiement en cours » resterait au-dessus d'un « Merci », au-dessus du QR).
+ * Modal fermable, actions remplacées par « Nouveau don ». Idempotent.
+ * kind : 'ok' (confirmé) | 'err' (échoué). */
+function markTerminal(kind){
+  clearInterval(_tick); _tick=null;
+  const ov=$('#payModal'); if(!ov)return;
+  ov.classList.add('expired','done');
+  ['.pm-timer','.pm-qr','.pm-hint','.pm-statut'].forEach(sel=>{
+    const el=ov.querySelector(sel); if(el) el.style.display='none';
+  });
+  const t=ov.querySelector('.pm-titre');
+  if(t) t.textContent=(kind==='ok'?'✅ ':'⚠️ ')+T(kind==='ok'?'don_merci':'don_echec');
+  const acts=ov.querySelector('.pm-acts');
+  if(acts){
+    acts.style.display='';
+    acts.innerHTML='';
+    const nb=document.createElement('button'); nb.type='button'; nb.className='cta ghost';
+    nb.textContent='↺ '+T('don_nouveau');
+    nb.addEventListener('click', ()=>{ closePayModal(); razDon(); });
+    acts.appendChild(nb);
+  }
+}
+
+/* Reprise : si une note de paiement en cours existe (et n'a pas dépassé le TTL
+ * dur), ré-ouvre le modal et reprend le polling. Appelée au chargement et au
+ * retour d'onglet (visibilitychange). Idempotente (garde _modalOpen). */
+function resumePendingIfAny(){
+  if(_modalOpen) return;
+  const p=loadPending();
+  if(!p||!p.uuid) return;
+  if(Date.now()-(p.ts||0) > TTL_MS){ clearPending(); return; }
+  openPayModal(p,{resumed:true});
+}
+
+/* Réinitialise le formulaire pour un nouveau don. */
 function razDon(){
-  const zone=$('#payZone'); if(zone){zone.remove();}
   const form=$('#donForm'); if(form){form.reset();}
   // Rétablit OM coché par défaut (form.reset() garde les radios initiaux, mais on s'assure).
   const om=document.querySelector('input[name=canal][value=OM]'); if(om)om.checked=true;
+  updateCanalIndic();
 }
 window.razDon=razDon;
 
-/* ---- Polling du statut (UX temps réel) ----
- * On interroge status.php toutes les 3 s jusqu'à un statut TERMINAL :
- *   - 'confirme' (COMPLETED / SUCCESSFUL côté opérateur)
- *   - 'echoue'   (FAILED / CANCELED côté opérateur — cf. walletApi.js)
- * On patiente longtemps (60 × 3 s = 180 s) car la confirmation OM/Sonatel
- * peut prendre 1-2 min (saisie du code PIN, validation opérateur). Si le
- * délai est dépassé sans statut terminal, on n'affirme PAS un échec : on
- * indique que la vérification se poursuit (reconcile.php rattrapera). */
-const POLL_MAX=60, POLL_INTERVAL_MS=3000;   // 60 × 3 s = 180 s (≥ 90 s requis)
-function pollStatut(uuid){
-  let n=0;
-  const t=setInterval(async()=>{
-    if(++n>POLL_MAX){
-      clearInterval(t);
-      // Délai dépassé : statut encore non terminal → surtout ne pas dire "échec".
-      setPayStatut('wait', T('don_en_cours'));
-      return;
-    }
-    const r=await api('api/pay/status.php?uuid='+encodeURIComponent(uuid));
-    if(r&&r.success&&r.statut==='confirme'){
-      clearInterval(t);
-      setPayStatut('ok', T('don_merci'));
-      loadSoutiens();  // rafraîchit le carrousel
-    }else if(r&&r.statut==='echoue'){
-      clearInterval(t);
-      setPayStatut('err', T('don_echec'));
-    }
-    // 'en_attente' (PENDING/PROCESSING) → on continue de poller.
-  },POLL_INTERVAL_MS);
-}
-
-/* Met à jour le statut affiché dans la zone de paiement. */
+/* Met à jour le statut affiché dans le modal. */
 function setPayStatut(type, text){
-  const el=$('#payStatut'); if(!el)return;
-  el.className='pay-statut '+(type==='ok'?'ok':type==='wait'?'wait':'err');
+  const el=document.querySelector('#payModal .pm-statut'); if(!el)return;
+  el.className='pm-statut '+(type==='ok'?'ok':type==='wait'?'wait':'err');
   el.textContent=text;
 }
 

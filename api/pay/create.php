@@ -22,7 +22,7 @@
 //      pas laisser de don en_attente orphelin polluer le rattrapage.
 //
 //  INPUT  : POST JSON {montant:int, canal:'OM'|'WAVE', telephone:str, nom:str?}
-//  OUTPUT : 200 {success:true, uuid, canal, payment_url?, om?, qrCode?}
+//  OUTPUT : 200 {success:true, uuid, canal, payment_url?, om?, maxit?, qrCode?}
 //           422 {success:false, message}        (validation)
 //           500 {success:false, message}        (DB don_creer)
 //           502 {success:false, message}        (pay_services indisponible)
@@ -195,5 +195,6 @@ json_out([
     'canal'       => $canal,
     'payment_url' => $ps['payment_url'] ?? null,
     'om'          => $ps['om'] ?? null,
+    'maxit'       => $ps['maxit'] ?? null,   // OM : lien app Maxit (bouton dédié)
     'qrCode'      => $ps['qrCode'] ?? null,
 ], 200);
