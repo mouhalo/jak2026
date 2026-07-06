@@ -55,20 +55,63 @@
     document.body.appendChild(o); return o;
   }
 
+  // Champ téléphone international éditable. Renvoie un handle.
+  function phoneField(defaultIso){
+    let cur = byIso(defaultIso||DEFAULT_ISO);
+    const wrap = document.createElement('div'); wrap.className='tel-row';
+    wrap.innerHTML =
+      '<div class="cc-wrap">'+
+        '<button type="button" class="cc-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="'+esc(T('otp_indicatif'))+'">'+
+          '<span class="ccf">'+cur.flag+'</span><span class="ccc">+'+cur.code+'</span><span class="chev">▾</span>'+
+        '</button>'+
+        '<div class="cc-list" role="listbox" hidden>'+
+          COUNTRIES.map(c=>'<button type="button" class="cc-opt" role="option" data-iso="'+c.iso+'">'+
+            '<span class="flag">'+c.flag+'</span><span>'+esc(c.name)+'</span><span class="code">+'+c.code+'</span></button>').join('')+
+        '</div>'+
+      '</div>'+
+      '<input class="authinp cc-num" inputmode="numeric" maxlength="'+cur.len+'" '+
+        'placeholder="'+esc(T('otp_tel'))+'">';
+    const btn=wrap.querySelector('.cc-btn'), list=wrap.querySelector('.cc-list'),
+          num=wrap.querySelector('.cc-num');
+    const setCur=c=>{ cur=c;
+      wrap.querySelector('.ccf').innerHTML=c.flag;
+      wrap.querySelector('.ccc').textContent='+'+c.code;
+      num.maxLength=c.len; num.value=num.value.slice(0,c.len);
+    };
+    const close=()=>{ list.hidden=true; btn.setAttribute('aria-expanded','false'); };
+    btn.addEventListener('click',()=>{ const open=list.hidden; list.hidden=!open;
+      btn.setAttribute('aria-expanded', open?'true':'false'); });
+    list.querySelectorAll('.cc-opt').forEach(o=>o.addEventListener('click',()=>{
+      setCur(byIso(o.dataset.iso)); close(); num.focus(); }));
+    num.addEventListener('input',()=>{ num.value=num.value.replace(/\D/g,'').slice(0,cur.len); });
+    document.addEventListener('click',e=>{ if(!wrap.contains(e.target)) close(); });
+    wrap.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+    return {
+      el: wrap,
+      getCode: ()=>cur.code,
+      getNational: ()=>num.value.replace(/\D/g,''),
+      getE164Digits: ()=>cur.code+num.value.replace(/\D/g,''),
+      validate: ()=>num.value.replace(/\D/g,'').length===cur.len,
+      focus: ()=>num.focus(),
+    };
+  }
+
   function openLogin(){
     const o=overlay(
       '<h3>'+esc(T('acces_membre'))+'</h3>'+
       '<p class="muted" id="aMsg">'+esc(T('otp_envoi'))+'</p>'+
-      '<input id="aTel" inputmode="numeric" maxlength="9" placeholder="'+esc(T('otp_tel'))+'" class="authinp">'+
+      '<div id="aTelMount"></div>'+
       '<button class="cta" id="aSend" style="width:100%">📲 '+esc(T('otp_valider'))+'</button>'+
       '<div id="aS2" style="display:none;margin-top:10px">'+
         '<input id="aCode" inputmode="numeric" maxlength="6" placeholder="'+esc(T('otp_code'))+'" class="authinp otp">'+
         '<button class="cta" id="aVerify" style="width:100%">'+esc(T('otp_valider'))+'</button></div>');
     const msg=t=>$('#aMsg').textContent=t;
+    const pf=phoneField(DEFAULT_ISO);
+    o.querySelector('#aTelMount').appendChild(pf.el);
     $('#aSend').addEventListener('click',async e=>{
-      const tel=$('#aTel').value.replace(/\D/g,''); if(tel.length!==9){msg(T('otp_tel'));return;}
+      if(!pf.validate()){ msg(T('otp_num_invalide')); return; }
       e.target.disabled=true;
-      const r=await api('api/auth/request-otp.php',{role:'membre',telephone:tel}).catch(()=>({success:false}));
+      const r=await api('api/auth/request-otp.php',{role:'membre',telephone:pf.getE164Digits()}).catch(()=>({success:false}));
       msg(r.message||''); if(r.success){$('#aS2').style.display='';} else e.target.disabled=false;
     });
     $('#aVerify').addEventListener('click',async ()=>{
