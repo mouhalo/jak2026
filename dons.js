@@ -18,7 +18,7 @@ function init(){
   $('#donTitre').textContent=T('don_titre');
   $('#donIntro').textContent=T('don_intro');
   // Labels du formulaire
-  $('#lblMontant').textContent=T('don_montant');
+  $('#lblMontant').innerHTML=T('don_montant')+' <span class="muted" style="text-transform:none;letter-spacing:0">'+esc(T('don_montant_hint'))+'</span>';
   $('#lblCanal').textContent=T('don_canal');
   $('#lblTel').textContent=T('don_telephone');
   $('#lblNom').textContent=T('don_nom');
@@ -28,13 +28,21 @@ function init(){
   // Bloc contacts (réutilise soutienBlock : numéros WhatsApp directs)
   $('#soutienMount').outerHTML=soutienBlock();
 
+  // Indicateur de progression (message sous le bouton, guidage pas-à-pas).
+  const fh=document.createElement('p');
+  fh.className='flow-hint';fh.id='flowHint';
+  $('#donSubmit').insertAdjacentElement('afterend',fh);
+
   // Formulaire
   $('#donForm').addEventListener('submit', submitDon);
-  // Indication dynamique du canal : écoute chaque radio et met à jour l'affichage.
+  // Flow progressif : on écoute montant + canaux + téléphone. updateFlow()
+  // active/désactive chaque étape en cascade (montant → canal → tél → bouton).
+  $('#fMontant').addEventListener('input', updateFlow);
+  $('#fTel').addEventListener('input', updateFlow);
   document.querySelectorAll('input[name=canal]').forEach(r=>{
-    r.addEventListener('change', updateCanalIndic);
+    r.addEventListener('change', ()=>{updateCanalIndic();updateFlow();});
   });
-  updateCanalIndic();  // init : canal coché par défaut (OM)
+  updateFlow();  // état initial : tout verrouillé sauf le montant
   // Carrousel + rattrapage (best-effort)
   loadSoutiens();
   api('api/pay/reconcile.php').catch(()=>{});  // déclenche le fallback throttlé
@@ -47,12 +55,57 @@ function init(){
   });
 }
 
+/* Flow progressif : active/désactive les étapes en cascade.
+ * Règles (inter-dépendance totale) :
+ *   1. Canaux  actifs  ⟺ montant saisi ≥ 1000 FCFA (et ≤ 2 000 000)
+ *   2. Tél/Nom actifs  ⟺ un canal choisi (et montant valide)
+ *   3. Bouton   actif  ⟺ téléphone = 9 chiffres (et tout ce qui précède)
+ * À chaque verrou, un message guide l'utilisateur vers la prochaine action. */
+function updateFlow(){
+  const montant=parseInt($('#fMontant').value,10);
+  const montantOk=!isNaN(montant)&&montant>=1000&&montant<=2000000;
+  const canal=document.querySelector('input[name=canal]:checked');
+  const canalOk=!!canal;
+  const tel=$('#fTel').value.replace(/\D/g,'');
+  const telOk=tel.length===9;
+
+  // (1) Canaux : verrouillés tant que le montant n'est pas valide.
+  const canalRow=$('#canalRow'), fldCanal=$('#fldCanal');
+  document.querySelectorAll('input[name=canal]').forEach(r=>{r.disabled=!montantOk;});
+  canalRow.classList.toggle('disabled',!montantOk);
+  fldCanal.classList.toggle('locked',!montantOk);
+  // Si le montant devient invalide après choix, on décoche le canal.
+  if(!montantOk&&canal){canal.checked=false;updateCanalIndic();}
+
+  // (2) Téléphone + Nom : verrouillés tant qu'aucun canal n'est choisi.
+  const telOk_=montantOk&&canalOk;
+  $('#fTel').disabled=!telOk_;
+  $('#fNom').disabled=!telOk_;
+  $('#fldTel').classList.toggle('locked',!telOk_);
+  $('#fldNom').classList.toggle('locked',!telOk_);
+  // Si le canal est décoché, on efface le tél et le bouton reste bloqué.
+  if(!telOk_){$('#fTel').value=$('#fTel').value.replace(/\D/g,'').slice(0,0);}
+
+  // (3) Bouton Contribuer : actif seulement si tél = 9 chiffres.
+  $('#donSubmit').disabled=!(telOk_&&telOk);
+
+  // Message de guidage : indique la prochaine action attendue.
+  const fh=$('#flowHint');
+  if(fh){
+    if(!montantOk){fh.className='flow-hint';fh.textContent=T('flow_attente_montant');}
+    else if(!canalOk){fh.className='flow-hint';fh.textContent=T('flow_attente_canal');}
+    else if(!telOk){fh.className='flow-hint';fh.textContent=T('flow_attente_tel');}
+    else{fh.className='flow-hint ok';fh.textContent='✓';}
+  }
+}
+
 /* Met à jour l'indication du canal choisi (icône + nom + hint).
- * Appelée au chargement puis à chaque clic sur un radio. */
+ * Appelée au chargement puis à chaque clic radio. Vide si aucun canal choisi. */
 function updateCanalIndic(){
   const el=$('#canalIndic'); if(!el)return;
   const checked=document.querySelector('input[name=canal]:checked');
-  const canal=checked?checked.value:'OM';
+  if(!checked){el.innerHTML='';return;}  // rien de sélectionné → pas d'indicateur
+  const canal=checked.value;
   const ic=canal==='WAVE'?'wave.png':'om.png';
   const nom=canal==='WAVE'?'Wave':'Orange Money';
   el.innerHTML=`<span class="ci-ic"><img src="icone/${ic}" alt=""></span>`+
@@ -65,7 +118,8 @@ async function submitDon(e){
   e.preventDefault();
   const btn=$('#donSubmit'), msg=$('#donMsg');
   const montant=parseInt($('#fMontant').value,10);
-  const canal=document.querySelector('input[name=canal]:checked').value;
+  const canalEl=document.querySelector('input[name=canal]:checked');
+  const canal=canalEl?canalEl.value:null;
   const telephone=$('#fTel').value.replace(/\D/g,'');
   const nom=$('#fNom').value.trim()||null;
   if(!montant||montant<1000||montant>2000000){
@@ -428,6 +482,9 @@ function closeModal(){
 }
 window.closeModal=closeModal;  // exposé pour les onclick inline si besoin
 
-if(document.readyState!=='loading')init();
-else document.addEventListener('DOMContentLoaded',init);
+// Hydratation des données (DB via sql_jsonpro, fallback data.js) avant l'init.
+// dons.html est la 5e page publique : on passe aussi par loadSiteData() pour
+// que les numéros WhatsApp / libellés événement soient toujours frais.
+if(document.readyState!=='loading')loadSiteData().then(init);
+else document.addEventListener('DOMContentLoaded',()=>loadSiteData().then(init));
 })();

@@ -43,7 +43,7 @@
   </div></section>
 </main>
 <script>
-(function(){
+loadSiteData().then(function(){
   const D=window.SITE_DATA;
   renderChrome('dign');
   document.getElementById('pgEyebrow').textContent=D.settings.event_nom+' · '+D.settings.dates_texte;
@@ -56,7 +56,7 @@
   document.getElementById('secProto').textContent=T('protocole');
   document.getElementById('protoTxt').textContent=T('protocole_txt');
   document.getElementById('ctaAcces').textContent='📍 '+T('cta_venue');
-})();
+});
 </script>
 </body>
 </html>

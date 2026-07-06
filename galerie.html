@@ -38,7 +38,7 @@
   </div></section>
 </main>
 <script>
-(function(){
+loadSiteData().then(function(){
   const D=window.SITE_DATA;
   renderChrome('galerie');
   document.getElementById('pgEyebrow').textContent=D.settings.event_nom+' · '+D.settings.dates_texte;
@@ -48,7 +48,7 @@
   document.getElementById('galGrid').innerHTML=items.map((g,i)=>
     `<figure style="cursor:pointer"><img src="${esc(g.src)}" loading="lazy" alt="">`+
     (g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:'')+`</figure>`).join('');
-})();
+});
 </script>
 </body>
 </html>

@@ -43,29 +43,29 @@
         <div class="fld">
           <label for="fMontant" id="lblMontant"></label>
           <input id="fMontant" name="montant" type="number" inputmode="numeric"
-                 min="1000" max="2000000" step="100" value="1000" required>
+                 min="1000" max="2000000" step="100" value="0" required>
         </div>
-        <div class="fld">
+        <div class="fld" id="fldCanal">
           <span id="lblCanal"></span>
           <div class="canal-row" id="canalRow">
-            <label><input type="radio" name="canal" value="WAVE">
+            <label><input type="radio" name="canal" value="WAVE" disabled>
               <img src="icone/wave.png" alt=""><span>Wave</span></label>
-            <label><input type="radio" name="canal" value="OM" checked>
+            <label><input type="radio" name="canal" value="OM" disabled>
               <img src="icone/om.png" alt=""><span>Orange Money</span></label>
           </div>
           <p class="canal-indic" id="canalIndic"></p>
         </div>
-        <div class="fld">
+        <div class="fld" id="fldTel">
           <label for="fTel" id="lblTel"></label>
           <input id="fTel" name="telephone" type="tel" inputmode="numeric"
-                 maxlength="9" placeholder="77 123 45 67" required>
+                 maxlength="9" placeholder="77 123 45 67" disabled required>
         </div>
-        <div class="fld">
+        <div class="fld" id="fldNom">
           <label for="fNom" id="lblNom"></label>
-          <input id="fNom" name="nom" type="text" maxlength="120" placeholder="">
+          <input id="fNom" name="nom" type="text" maxlength="120" placeholder="" disabled>
           <p class="muted" style="font-size:12px;margin-top:3px" id="lblAnonyme"></p>
         </div>
-        <button type="submit" class="cta" id="donSubmit" style="width:100%"></button>
+        <button type="submit" class="cta" id="donSubmit" style="width:100%" disabled></button>
         <div class="don-msg" id="donMsg" style="display:none"></div>
       </form>
     </div>

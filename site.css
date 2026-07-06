@@ -60,6 +60,23 @@ section{padding:34px 0}
 .sec-label::before{content:"";width:26px;height:2px;background:var(--gold)}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
 .panel p{line-height:1.7;font-size:14.5px;margin:0 0 10px;color:var(--ink)}
+/* Texte riche formaté (jak_presentation) — mis en forme par formatRichText().
+   Titres internes en or (Barlow Condensed), puces stylisées, paragraphes
+   aérés. Hérite du .panel p pour la typo de corps. */
+.rt-h{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+  font-size:19px;letter-spacing:.04em;color:var(--gold);margin:18px 0 8px;
+  display:flex;align-items:center;gap:10px}
+.rt-h::before{content:"";flex:0 0 22px;height:2px;background:var(--gold);border-radius:2px}
+.rt-h:first-child{margin-top:0}
+.rt-p{margin:0 0 12px}
+.rt-p:last-child{margin-bottom:0}
+.rt-ul{list-style:none;margin:6px 0 12px;padding:0}
+.rt-ul li{position:relative;padding-inline-start:22px;margin-bottom:8px;line-height:1.65;
+  font-size:14.5px;color:var(--ink)}
+.rt-ul li::before{content:"";position:absolute;inset-inline-start:4px;top:9px;
+  width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.rt-ul li:last-child{margin-bottom:0}
+.rt-ul strong,.rt-p strong{color:var(--ink);font-weight:600}
 .muted{color:var(--muted)}
 .todo{color:#e6a878;font-style:italic}
 blockquote{margin:14px 0;padding:14px 18px;border-inline-start:3px solid var(--gold);
@@ -70,7 +87,7 @@ blockquote{margin:14px 0;padding:14px 18px;border-inline-start:3px solid var(--g
   display:flex;flex-direction:column}
 .pcard .ph{height:170px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .pcard .ph img{width:100%;height:100%;object-fit:cover}
-.pcard .ph .noimg{font-family:'Barlow Condensed',sans-serif;font-size:44px;color:var(--line);font-weight:700}
+.pcard .ph .noimg{font-family:'Barlow Condensed',sans-serif;font-size:54px;color:var(--gold);font-weight:700;opacity:.85;line-height:1}
 .pcard .bd{padding:13px 15px;display:flex;flex-direction:column;gap:6px;flex:1}
 .pcard h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
   font-size:18px;letter-spacing:.02em;margin:0}
@@ -322,6 +339,22 @@ html[dir="rtl"] .fab-dons{right:auto;left:18px}
 .don-msg{margin-top:10px;padding:10px 14px;border-radius:10px;font-size:14px;text-align:center}
 .don-msg.ok{background:rgba(46,125,50,.12);color:var(--green);border:1px solid var(--green)}
 .don-msg.err{background:rgba(198,40,40,.12);color:var(--red);border:1px solid var(--red)}
+/* ---- Flow progressif : champs désactivés tant que l'étape précédente n'est pas valide ---- */
+/* Inputs désactivés (tél, nom) : opacité réduite, curseur interdit. */
+.don-form input:disabled{opacity:.45;cursor:not-allowed}
+/* Bouton Contribuer désactivé : aspect estompé, non cliquable. */
+.don-form .cta:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4)}
+/* Bloc canal désactivé : les labels deviennent non cliquables et grisés.
+   On cible le conteneur marqué .disabled (ajouté/retrait par updateFlow()). */
+.don-form .canal-row.disabled label{opacity:.4;cursor:not-allowed;pointer-events:none}
+.don-form .canal-row.disabled label:has(input:checked){border-color:var(--line);background:transparent}
+/* Indicateur de progression : message discret sous le formulaire qui guide
+   l'utilisateur étape par étape (mis à jour par updateFlow()). */
+.don-form .flow-hint{margin-top:4px;font-size:12.5px;color:var(--muted);text-align:center;
+  line-height:1.5;min-height:18px;font-style:italic}
+.don-form .flow-hint.ok{color:var(--green);font-style:normal}
+/* Conteneur de champ marqué verrouillé (étiquette + input grisés ensemble). */
+.don-form .fld.locked label{opacity:.5}
 
 /* Zone de paiement affichée après création du don : QR + boutons.
    Bloc inline sous le formulaire, styled comme un .panel dédié. */
@@ -397,12 +430,15 @@ html[dir="rtl"] .fab-dons{right:auto;left:18px}
 /* Carrousel des soutiens — réutilise .jcaro-stage/.jslide mais en cartes texte */
 .soutiens-caro{position:relative;padding:10px 0 4px;text-align:center;overflow:hidden;
   min-height:120px}
+/* Hauteur propre à ce carrousel (cartes texte ~110px) — NE PAS toucher au .jcaro
+   de base (min(58vw,400px)) qui sert au carrousel photo de la galerie. */
+.soutiens-caro .jcaro{height:170px}
 .soutiens-caro .sc-list{display:none}  /* liste statique (reduced-motion) */
 .soutien-card{border-radius:16px;padding:18px 16px;border:1px solid var(--line);
   background:var(--panel-2);display:inline-flex;flex-direction:column;align-items:center;
   gap:6px;min-width:min(72vw,300px)}
-.soutien-card .sc-num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;
-  letter-spacing:.04em;color:var(--ink)}
+.soutien-card .sc-num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;
+  letter-spacing:.02em;color:var(--ink);white-space:nowrap}
 .soutien-card .sc-nom{font-family:'Barlow Condensed',sans-serif;font-size:18px;
   text-transform:uppercase;letter-spacing:.03em;color:var(--gold)}
 .soutien-card .sc-canal{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--muted)}

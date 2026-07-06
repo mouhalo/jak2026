@@ -86,7 +86,7 @@
   <div id="soutienMount"></div>
 </main>
 <script>
-(function(){
+loadSiteData().then((function(){
   const D=window.SITE_DATA,S=D.settings,C=D.cheikh;
   renderChrome('accueil');
   document.getElementById('chPhoto').src=C.photo||'';
@@ -109,7 +109,7 @@
   document.getElementById('soutienMount').outerHTML=soutienBlock();
   document.getElementById('ctaGal').textContent='🖼 '+T('nav_galerie');
   startCountdown('countdown');
-})();
+}));
 </script>
 </body>
 </html>

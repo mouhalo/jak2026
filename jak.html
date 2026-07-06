@@ -43,11 +43,11 @@
   <div id="soutienMount"></div>
 </main>
 <script>
-(function(){
+loadSiteData().then(function(){
   const D=window.SITE_DATA;
   renderChrome('jak');
   document.getElementById('pgEyebrow').textContent=D.settings.event_nom+' · '+D.settings.dates_texte;
-  document.getElementById('jakPres').innerHTML=todoWrap(D.settings.jak_presentation);
+  document.getElementById('jakPres').innerHTML=formatRichText(D.settings.jak_presentation);
   document.getElementById('secMembres').textContent=T('jak_membres');
   // fondateurs d'abord
   const membres=[...(D.jak||[])].sort((a,b)=>(b.fondateur==='OUI')-(a.fondateur==='OUI'));
@@ -56,7 +56,7 @@
   initCarousel(document.getElementById('grpCaro'),
     membres.filter(p=>p.photo).map(p=>({src:p.photo,legende:p.nom_complet,fonction:p.fonction,bio:p.biographie,adresse:p.adresse,fondateur:p.fondateur==='OUI'})),{delay:3600});
   document.getElementById('soutienMount').outerHTML=soutienBlock();
-})();
+});
 </script>
 </body>
 </html>

@@ -105,6 +105,21 @@
     rd.readAsDataURL(file);
   }
 
-  if(document.readyState!=='loading') mountButton();
-  else document.addEventListener('DOMContentLoaded',mountButton);
+  // Le chrome (nav) peut être monté soit synchro (pages sans loadSiteData,
+  // e.g. dons.html) au DOMContentLoaded, soit asynchrone après fetch
+  // (loadSiteData). On s'abonne aux deux signaux ; mountButton est idempotent
+  // (il ne remonte pas si la nav contient déjà le bouton).
+  let _mounted=false;
+  function tryMount(){
+    if(_mounted)return;
+    const nav=document.querySelector('nav.site .in');
+    if(nav&&!nav.querySelector('.memberAccess')){mountButton();}
+    if(nav)_mounted=true;
+  }
+  // nav déjà présente au chargement du script → mountButton direct.
+  if(document.querySelector('nav.site .in')){tryMount();}
+  // Sinon, nav créée plus tard (soit DOMContentLoaded pour le chemin synchrone,
+  // soit l'événement chrome:ready émis par renderChrome après fetch).
+  document.addEventListener('DOMContentLoaded',tryMount);
+  document.addEventListener('chrome:ready',tryMount);
 })();

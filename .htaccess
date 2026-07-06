@@ -19,7 +19,7 @@ RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
   # Fichiers qui évoluent (données + code de l'app) → toujours revalider, jamais
   # figés en immuable. Placé APRÈS le FilesMatch pour écraser la règle immuable.
   # (Les images/polices/mp4 restent immuables : c'est là que le cache long compte.)
-  <FilesMatch "^(data\.(js|json)|site\.js|auth\.js|site\.css)$">
+  <FilesMatch "^(data\.(js|json)|site\.js|auth\.js|dons\.js|site\.css)$">
     Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
 

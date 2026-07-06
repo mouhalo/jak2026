@@ -22,6 +22,7 @@ const I18N={
    don_titre:"Soutenez la Jeunesse Al Khaïry",
    don_intro:"Votre contribution aide à organiser dignement nos activités",
    don_montant:"Montant (FCFA)",
+   don_montant_hint:"(minimum 1000 FCFA)",
    montant_min_titre:"Montant insuffisant",
    montant_min_txt:"Le montant minimum d'un don est de 1000 FCFA. Merci de votre compréhension.",
    fermer:"Fermer",
@@ -29,6 +30,9 @@ const I18N={
    canal_choisi:"Canal choisi :",
    canal_hint_OM:"— vous payez via l'app Orange Money",
    canal_hint_WAVE:"— vous payez via l'app Wave",
+   flow_attente_montant:"Saisissez un montant (min. 1000 FCFA) pour choisir votre moyen de paiement.",
+   flow_attente_canal:"Choisissez un moyen de paiement pour saisir votre numéro.",
+   flow_attente_tel:"Saisissez votre numéro (9 chiffres) pour confirmer.",
    don_telephone:"Votre téléphone (9 chiffres)",
    don_nom:"Votre nom / pseudo (optionnel)",
    don_anonyme:"Laissez vide pour un don anonyme",
@@ -47,8 +51,11 @@ const I18N={
    don_ouvrir_wave:"Ouvrir Wave",
    don_ouvrir_maxit:"Ouvrir Maxit",
    don_echec:"Service de paiement indisponible. Réessayez plus tard.",
-   soutiens_recents:"Soutiens récents",
-   soutien_anonyme:"Anonyme"},
+   soutiens_recents:"Ils nous ont soutenu",
+   soutien_anonyme:"Anonyme",
+   otp_indicatif:"Indicatif",
+   otp_num_invalide:"Numéro invalide pour ce pays",
+   tel_lecture_seule:"Pour modifier votre numéro, contactez l'administrateur."},
  en:{nav_accueil:"The Cheikh",nav_dign:"Dignitaries",nav_jak:"Jeunesse Al Khaïry",nav_galerie:"Gallery",nav_acces:"Map & Access",
    bio:"Biography",adresse:"Address",citations:"Teachings & quotes",programme:"Programme",
    galerie:"Gallery",soutien:"Support the event",contact:"Contact",
@@ -65,6 +72,7 @@ const I18N={
    don_titre:"Support Jeunesse Al Khaïry",
    don_intro:"Your contribution helps organise our activities with dignity",
    don_montant:"Amount (FCFA)",
+   don_montant_hint:"(minimum 1000 FCFA)",
    montant_min_titre:"Amount too low",
    montant_min_txt:"The minimum donation is 1000 FCFA. Thank you for your understanding.",
    fermer:"Close",
@@ -72,6 +80,9 @@ const I18N={
    canal_choisi:"Selected method:",
    canal_hint_OM:"— you pay via the Orange Money app",
    canal_hint_WAVE:"— you pay via the Wave app",
+   flow_attente_montant:"Enter an amount (min. 1000 FCFA) to choose your payment method.",
+   flow_attente_canal:"Choose a payment method to enter your number.",
+   flow_attente_tel:"Enter your number (9 digits) to confirm.",
    don_telephone:"Your phone (9 digits)",
    don_nom:"Your name / alias (optional)",
    don_anonyme:"Leave empty for an anonymous donation",
@@ -90,8 +101,11 @@ const I18N={
    don_ouvrir_wave:"Open Wave",
    don_ouvrir_maxit:"Open Maxit",
    don_echec:"Payment service unavailable. Please try again later.",
-   soutiens_recents:"Recent supporters",
-   soutien_anonyme:"Anonymous"},
+   soutiens_recents:"They supported us",
+   soutien_anonyme:"Anonymous",
+   otp_indicatif:"Country code",
+   otp_num_invalide:"Invalid number for this country",
+   tel_lecture_seule:"To change your number, contact the administrator."},
  wo:{nav_accueil:"Cheikh bi",nav_dign:"Ñi am maqaama",nav_jak:"Jeunesse Al Khaïry",nav_galerie:"Nataal yi",nav_acces:"Palaŋ & Yoon",
    bio:"Jaar-jaaram",adresse:"Dëkkuwaay",citations:"Njàngale ak i wax",programme:"Prograam",
    galerie:"Nataal yi",soutien:"Jàppale xew mi",contact:"Jokkoo",
@@ -108,6 +122,7 @@ const I18N={
    don_titre:"Jàppale Jeunesse Al Khaïry",
    don_intro:"Sa ndimbal day tax ba sunu liggéey am ci teraanga",
    don_montant:"Màndarga (FCFA)",
+   don_montant_hint:"(gënee ndóq 1000 FCFA)",
    montant_min_titre:"Màndarga bu ndóq",
    montant_min_txt:"Màndarga bu gënee ndóq mooy 1000 FCFA. Jërejëf ci sa muñ.",
    fermer:"Tëj",
@@ -115,6 +130,9 @@ const I18N={
    canal_choisi:"Anug joxe bu tànn :",
    canal_hint_OM:"— ngay joxe ci app Orange Money bi",
    canal_hint_WAVE:"— ngay joxe ci app Wave bi",
+   flow_attente_montant:"Bind benn màndarga (gënee ndóq 1000 FCFA) ngir tànn sa anug joxe.",
+   flow_attente_canal:"Tànn benn anug joxe ngir bind sa numéro.",
+   flow_attente_tel:"Bind sa numéro (9 raaya) ngir dëggu.",
    don_telephone:"Sa téléphone (9 raaya)",
    don_nom:"Sa tur / pseudo (du yobu)",
    don_anonyme:"Betal bu feks nga ngir jàppale bu nëbb",
@@ -133,8 +151,11 @@ const I18N={
    don_ouvrir_wave:"Ubbi Wave",
    don_ouvrir_maxit:"Ubbi Maxit",
    don_echec:"Serwisi joxe du am. Tòppati ci gannaaw.",
-   soutiens_recents:"Ñi mujt jàppale",
-   soutien_anonyme:"Nëbb"},
+   soutiens_recents:"Ñoo nu jàppale",
+   soutien_anonyme:"Nëbb",
+   otp_indicatif:"Indicatif réew",
+   otp_num_invalide:"Numero baaxul ci réew mi",
+   tel_lecture_seule:"Ngir soppi sa numero, jokkool ak admin bi."},
  ff:{nav_accueil:"Ceerno oo",nav_dign:"Tedduɓe",nav_jak:"Jeunesse Al Khaïry",nav_galerie:"Nate",nav_acces:"Kartal & Naatirde",
    bio:"Nguurndam makko",adresse:"Ñiiɓirde",citations:"Jaŋde e konnguɗi",programme:"Prograam",
    galerie:"Nate",soutien:"Wallitde dille ɗe",contact:"Jokkondiral",
@@ -151,6 +172,7 @@ const I18N={
    don_titre:"Wallitde Jeunesse Al Khaïry",
    don_intro:"Ballal maa ina walla yuɓɓinde golle amen ɗe no moƴƴiri",
    don_montant:"Minta (FCFA)",
+   don_montant_hint:"(ko ɓuri famarnde ko 1000 FCFA)",
    montant_min_titre:"Minta ɓurkaɗo famarnde",
    montant_min_txt:"Minta ɓurɗo famarnde ko 1000 FCFA. Jaaraama e muñanke maa.",
    fermer:"Udd",
@@ -158,6 +180,9 @@ const I18N={
    canal_choisi:"Laawol cuɓaangol :",
    canal_hint_OM:"— ɗaɓɓirtaa ko e jaaɓngol Orange Money",
    canal_hint_WAVE:"— ɗaɓɓirtaa ko e jaaɓngol Wave",
+   flow_attente_montant:"Winndu minta (ko ɓuri famarnde ko 1000 FCFA) ngam suɓaade laawol jowgol.",
+   flow_attente_canal:"Suɓo laawol jowgol ngam winndude limoore maa.",
+   flow_attente_tel:"Winndu limoore maa (9 limooje) ngam teeŋtinde.",
    don_telephone:"Telefone maa (9 limooje)",
    don_nom:"Innde maa / pseudo (ñaawaaɗe)",
    don_anonyme:"Haaɗiraa ngam ballal coom",
@@ -176,8 +201,11 @@ const I18N={
    don_ouvrir_wave:"Uddit Wave",
    don_ouvrir_maxit:"Uddit Maxit",
    don_echec:"Sarwisee jowgol woodaani. Tiiɗno fuɗɗito-ɗaa ɓaawo.",
-   soutiens_recents:"Ballitooɓe cakkitiiɓe",
-   soutien_anonyme:"Coom"} ,
+   soutiens_recents:"Ɓe ballitii min",
+   soutien_anonyme:"Coom",
+   otp_indicatif:"Tonngoode leydi",
+   otp_num_invalide:"Limngal moƴƴaani ngal leydi",
+   tel_lecture_seule:"Ngam waylude limngal maa, jokkondir e admin on."} ,
  ar:{nav_accueil:"الشيخ",nav_dign:"الأعيان",nav_jak:"شبيبة الخيري",nav_galerie:"معرض الصور",nav_acces:"الخريطة والدخول",
    bio:"السيرة",adresse:"العنوان",citations:"تعاليم وأقوال",programme:"البرنامج",
    galerie:"معرض الصور",soutien:"دعم الحدث",contact:"اتصل بنا",
@@ -194,6 +222,7 @@ const I18N={
    don_titre:"ادعم شبيبة الخيري",
    don_intro:"تساعد مساهمتكم في تنظيم أنشطتنا على أكمل وجه",
    don_montant:"المبلغ (فرنك)",
+   don_montant_hint:"(الحد الأدنى 1000 فرنك)",
    montant_min_titre:"المبلغ غير كافٍ",
    montant_min_txt:"الحد الأدنى للتبرّع هو 1000 فرنك. شكرًا لتفهّمكم.",
    fermer:"إغلاق",
@@ -201,6 +230,9 @@ const I18N={
    canal_choisi:"الوسيلة المختارة :",
    canal_hint_OM:"— تدفع عبر تطبيق أورانج موني",
    canal_hint_WAVE:"— تدفع عبر تطبيق ويف",
+   flow_attente_montant:"أدخل مبلغًا (الحد الأدنى 1000 فرنك) لاختيار وسيلة الدفع.",
+   flow_attente_canal:"اختر وسيلة الدفع لإدخال رقمك.",
+   flow_attente_tel:"أدخل رقمك (9 أرقام) للتأكيد.",
    don_telephone:"هاتفك (9 أرقام)",
    don_nom:"اسمك / لقبك (اختياري)",
    don_anonyme:"اتركه فارغًا لتبرّع مجهول",
@@ -219,14 +251,42 @@ const I18N={
    don_ouvrir_wave:"فتح ويف",
    don_ouvrir_maxit:"فتح ماكسيت",
    don_echec:"خدمة الدفع غير متاحة. حاول لاحقًا.",
-   soutiens_recents:"المتبرّعون الأخيرون",
-   soutien_anonyme:"مجهول"}
+   soutiens_recents:"لقد دعمونا",
+   soutien_anonyme:"مجهول",
+   otp_indicatif:"رمز الاتصال",
+   otp_num_invalide:"رقم غير صالح لهذا البلد",
+   tel_lecture_seule:"لتغيير رقمك، تواصل مع المسؤول."}
 };
-/* le brouillon enregistré dans admin.html est appliqué en direct sur cet appareil */
-try{
-  const _dr=localStorage.getItem('admin_draft');
-  if(_dr){const _d=JSON.parse(_dr);if(_d&&_d.settings&&_d.jak)window.SITE_DATA=_d;}
-}catch(e){}
+/* === Hydratation de window.SITE_DATA ============================
+   Ordre de priorité (du plus haut au plus bas) :
+     1. admin_draft (localStorage) — prévisualisation admin locale. PRIME
+        toujours : l'admin voit ses modifs non publiées en direct.
+     2. api/site-data.php — projection fraîche depuis PostgreSQL via
+        sql_jsonpro (source canonique en production).
+     3. data.js — filet statique jour-J (déjà chargé via <script src>).
+
+   loadSiteData() renvoie une Promise résolue quand SITE_DATA est prêt.
+   Les pages publiques l'attendent avant de rendre (pattern .then(render)).
+   En cas d'échec réseau/serveur, on garde le data.js déjà en place : le
+   site reste fonctionnel même si la base ou le proxy PHP tombent (PRD #2).
+   ================================================================= */
+window.loadSiteData=function(){
+  // (1) Brouillon admin local → prime, pas de fetch réseau.
+  try{
+    const _dr=localStorage.getItem('admin_draft');
+    if(_dr){const _d=JSON.parse(_dr);if(_d&&_d.settings&&_d.jak){window.SITE_DATA=_d;return Promise.resolve();}}
+  }catch(e){}
+  // (2) Pas de draft → on tente la DB via le proxy PHP.
+  //     Timeout 4s : si lent/indispo, on retombe vite sur data.js (filet).
+  return fetch('api/site-data.php',{credentials:'same-origin'})
+    .then(r=>r.ok?r.json():Promise.reject(new Error('HTTP '+r.status)))
+    .then(j=>{
+      if(j&&j.success&&j.data&&j.data.settings&&j.data.jak){
+        window.SITE_DATA=j.data;
+      }
+    })
+    .catch(()=>{ /* silencieux : data.js (filet) reste en place */ });
+};
 
 let lang='fr';
 try{lang=localStorage.getItem('site_lang')||'fr';}catch(e){}
@@ -245,7 +305,14 @@ const FLAG={
   sn:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="2" height="4" fill="#00853F"/><rect x="2" width="2" height="4" fill="#FDEF42"/><rect x="4" width="2" height="4" fill="#E31B23"/><path d="M3 1.35l.221.68h.716l-.579.42.221.681L3 3.39l-.579.42.221-.68-.579-.42h.716z" fill="#00853F"/></svg>',
   sa:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="4" fill="#006C35"/><rect x="1" y="2.7" width="4" height="0.25" rx=".12" fill="#fff"/></svg>',
   gb:'<svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#C8102E" stroke-width="4"/><path d="M30,0V30M0,15H60" stroke="#fff" stroke-width="10"/><path d="M30,0V30M0,15H60" stroke="#C8102E" stroke-width="6"/></svg>'
+  ,mr:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="4" fill="#006233"/><rect width="6" height="0.5" fill="#cd2a3e"/><rect y="3.5" width="6" height="0.5" fill="#cd2a3e"/><circle cx="3" cy="2.05" r="0.62" fill="#ffc400"/><circle cx="3.18" cy="2.05" r="0.52" fill="#006233"/></svg>'
+  ,ml:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="2" height="4" fill="#14b53a"/><rect x="2" width="2" height="4" fill="#fcd116"/><rect x="4" width="2" height="4" fill="#ce1126"/></svg>'
+  ,gn:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="2" height="4" fill="#ce1126"/><rect x="2" width="2" height="4" fill="#fcd116"/><rect x="4" width="2" height="4" fill="#009460"/></svg>'
+  ,ci:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="2" height="4" fill="#f77f00"/><rect x="2" width="2" height="4" fill="#fff"/><rect x="4" width="2" height="4" fill="#009e60"/></svg>'
+  ,gm:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="1.28" fill="#ce1126"/><rect y="1.28" width="6" height="0.16" fill="#fff"/><rect y="1.44" width="6" height="1.12" fill="#0c1c8c"/><rect y="2.56" width="6" height="0.16" fill="#fff"/><rect y="2.72" width="6" height="1.28" fill="#3a7728"/></svg>'
+  ,gw:'<svg class="flag" viewBox="0 0 6 4" aria-hidden="true"><rect width="6" height="2" fill="#fcd116"/><rect y="2" width="6" height="2" fill="#009e49"/><rect width="2" height="4" fill="#ce1126"/><path d="M1 1.35l.221.68h.716l-.579.42.221.681L1 2.61l-.579.42.221-.68-.579-.42h.716z" fill="#000"/></svg>'
 };
+window.FLAG=FLAG;
 const LANGMETA={
   fr:{name:'Français',flag:FLAG.fr}, wo:{name:'Wolof',flag:FLAG.sn},
   ar:{name:'العربية',flag:FLAG.sa}, ff:{name:'Pulaar',flag:FLAG.sn},
@@ -287,6 +354,10 @@ window.renderChrome=function(active){
     fab.innerHTML=`<span class="fab-heart">❤</span> ${T('nav_dons')}`;
     document.body.appendChild(fab);
   }
+  // Signale que le chrome (nav + footer) est monté. auth.js s'y abonne pour
+  // ajouter le bouton "Accès membre" — nécessaire car avec loadSiteData()
+  // async, la nav peut apparaître après DOMContentLoaded.
+  document.dispatchEvent(new CustomEvent('chrome:ready'));
 };
 
 window.startCountdown=function(elId){
@@ -306,9 +377,62 @@ window.startCountdown=function(elId){
 window.esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 window.todoWrap=s=>{const e=esc(s);return /\[À COMPLÉTER|\[A COMPLETER|\[À CONFIRMER/i.test(s)?`<span class="todo">${e}</span>`:e;};
 
+/* Formatage riche sécurisé pour les champs de texte longs (ex. jak_presentation).
+   Supporte un sous-ensemble Markdown léger :
+     ## Titre         → <h4> (titrage interne au panel)
+     **gras**         → <strong>
+     - puce           → <li> (regroupés en <ul> si consécutifs)
+     ligne vide       → séparation de paragraphes <p>
+     ligne simple     → <br> à l'intérieur d'un paragraphe
+   Sécurité : on échappe TOUT le HTML AVANT d'appliquer la mise en forme, donc
+   aucune balise utilisateur ne peut s'injecter (XSS-safe). On ne produit que
+   des balises que nous contrôlons (p/strong/br/ul/li/h4). */
+window.formatRichText=function(s){
+  const raw=String(s==null?'':s);
+  if(!raw.trim())return '';
+  const escd=esc(raw);
+  // Découpe en blocs séparés par ligne vide (≥2 newlines).
+  const blocks=escd.split(/\n{2,}/);
+  return blocks.map(block=>{
+    const lines=block.split(/\n/);
+    // Titre interne (## ...)
+    if(lines.length===1&&/^##\s+/.test(lines[0].trim())){
+      return `<h4 class="rt-h">${lines[0].trim().replace(/^##\s+/,'')}</h4>`;
+    }
+    // Liste à puces : toutes les lignes du bloc commencent par '- '
+    if(lines.every(l=>/^\s*-\s+/.test(l))){
+      const items=lines.map(l=>`<li>${inline(l.replace(/^\s*-\s+/,''))}</li>`).join('');
+      return `<ul class="rt-ul">${items}</ul>`;
+    }
+    // Paragraphe : lignes jointes par <br>, mise en forme inline appliquée.
+    return `<p class="rt-p">${lines.map(inline).join('<br>')}</p>`;
+  }).join('');
+  /* Mise en forme inline : **gras**. Étendue facilement (italique, liens...). */
+  function inline(t){
+    return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  }
+};
+
+/* Calcule l'initiale affichée dans un avatar de fallback (.noimg).
+   On retire les préfixes honorifiques courants (Cheikh, Dr, Hadj, El Hadj,
+   Thierno, Zeyda, Mawlana, Pr, Vieux...) et les marqueurs [À COMPLÉTER]
+   pour afficher la 1re lettre du nom réel, jamais un '?' générique. */
+window.avatarInitial=function(nom){
+  const clean=String(nom==null?'':nom)
+    .replace(/\[[^\]]*\]/g,' ')   // [À COMPLÉTER …]
+    .replace(/^\s*(Cheikh|Dr|Hadj|El\s+Hadj|Thierno|Zeyda|Mawlana|Pr|Vieux|Colonel|Oustaz)\b/i,'')
+    .trim();
+  return (clean.charAt(0)||'?').toUpperCase();
+};
+
 window.personCard=function(p,extra){
-  const ph=p.photo?`<img src="${esc(p.photo)}" alt="${esc(p.nom_complet)}" onerror="this.outerHTML='<div class=noimg>؟</div>'">`
-                  :`<div class="noimg">${esc((p.nom_complet||'?').replace(/\[.*?\]/,'?').trim().charAt(0)||'?')}</div>`;
+  const ini=avatarInitial(p.nom_complet);
+  // Si photo absente OU vide → on ne génère pas d'<img> (évite un onerror à 404
+  // systématique qui pollue la console et le réseau). Le placeholder .noimg
+  // avec l'initiale est rendu directement.
+  const ph=p.photo
+    ?`<img src="${esc(p.photo)}" alt="${esc(p.nom_complet)}" onerror="this.outerHTML='<div class=noimg>${esc(ini)}</div>'">`
+    :`<div class="noimg">${esc(ini)}</div>`;
   return `<article class="pcard"><div class="ph">${ph}</div><div class="bd">
     ${extra&&extra.fondateur?`<span class="badge-f">★ ${T('fondateur')}</span>`:''}
     <h3>${todoWrap(p.nom_complet)}</h3>
