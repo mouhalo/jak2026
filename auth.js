@@ -133,7 +133,9 @@
       '<img id="ePhotoPrev" class="authprev" src="'+esc(m.photo||'')+'" alt="">'+
       '<label class="authlbl">Nom</label><input id="eNom" class="authinp" value="'+esc(m.nom_complet||'')+'">'+
       '<label class="authlbl">Adresse</label><input id="eAdr" class="authinp" value="'+esc(m.adresse||'')+'">'+
-      '<label class="authlbl">Téléphone (9 chiffres)</label><input id="eTel" class="authinp" inputmode="numeric" maxlength="9" value="'+esc(m.telephone||'')+'">'+
+      '<label class="authlbl">'+esc(T('otp_tel'))+'</label>'+
+      phoneReadOnlyHTML(m.telephone||'')+
+      '<p class="muted" style="font-size:12px;margin-top:3px">'+esc(T('tel_lecture_seule'))+'</p>'+
       '<label class="authlbl">Biographie</label><textarea id="eBio" class="authinp" rows="4">'+esc(m.biographie||'')+'</textarea>'+
       '<p class="muted" id="eMsg"></p>'+
       '<button class="cta" id="eSave" style="width:100%">'+esc(T('enregistrer'))+'</button>'+
@@ -147,8 +149,8 @@
         err=>{$('#eMsg').textContent=err;});
     });
     $('#eSave').addEventListener('click',async ()=>{
-      const body={photo:photoData,nom_complet:$('#eNom').value,adresse:$('#eAdr').value,
-        telephone:$('#eTel').value.replace(/\D/g,''),biographie:$('#eBio').value};
+      const body={photo:photoData,nom_complet:$('#eNom').value,
+        adresse:$('#eAdr').value,biographie:$('#eBio').value};
       const r=await api('api/member/save-fiche.php',body).catch(()=>({success:false}));
       $('#eMsg').textContent=r.success?T('saved_ok'):((r.errors&&r.errors.join(', '))||r.message||'Erreur');
     });
