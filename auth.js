@@ -4,6 +4,41 @@
   const $=s=>document.querySelector(s);
   const api=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}).then(r=>r.json());
 
+  const FLAG = window.FLAG || {};
+  const COUNTRIES = [
+    {iso:'sn', code:'221', name:'Sénégal',       len:9,  flag:FLAG.sn||''},
+    {iso:'mr', code:'222', name:'Mauritanie',    len:8,  flag:FLAG.mr||''},
+    {iso:'ml', code:'223', name:'Mali',          len:8,  flag:FLAG.ml||''},
+    {iso:'gn', code:'224', name:'Guinée',        len:9,  flag:FLAG.gn||''},
+    {iso:'ci', code:'225', name:"Côte d'Ivoire", len:10, flag:FLAG.ci||''},
+    {iso:'gm', code:'220', name:'Gambie',        len:7,  flag:FLAG.gm||''},
+    {iso:'gw', code:'245', name:'Guinée-Bissau', len:7,  flag:FLAG.gw||''},
+    {iso:'fr', code:'33',  name:'France',        len:9,  flag:FLAG.fr||''},
+  ];
+  const DEFAULT_ISO = 'sn';
+  const byIso = iso => COUNTRIES.find(c=>c.iso===iso) || COUNTRIES[0];
+
+  // Découpe un numéro stocké (E.164 avec ou sans '+') en pays + national.
+  // Choisit le code correspondant le plus LONG (245 avant 22, etc.).
+  function splitE164(stored){
+    const d = String(stored||'').replace(/\D/g,'');
+    let best = null;
+    for (const c of COUNTRIES){
+      if (d.startsWith(c.code) && (!best || c.code.length>best.code.length)) best = c;
+    }
+    if (!best) return {iso:'', code:'', national:d};
+    return {iso:best.iso, code:best.code, national:d.slice(best.code.length)};
+  }
+
+  // Rendu lecture seule : drapeau + indicatif + national, non éditable.
+  function phoneReadOnlyHTML(stored){
+    const s = splitE164(stored);
+    const c = s.iso ? byIso(s.iso) : null;
+    const flag = c ? c.flag : '';
+    const code = s.code ? ('+'+s.code+' ') : '';
+    return '<div class="cc-ro">'+flag+'<span>'+esc(code+s.national)+'</span></div>';
+  }
+
   // Bouton d'accès dans la barre de navigation
   function mountButton(){
     const nav=document.querySelector('nav.site .in'); if(!nav)return;
@@ -122,4 +157,6 @@
   // soit l'événement chrome:ready émis par renderChrome après fetch).
   document.addEventListener('DOMContentLoaded',tryMount);
   document.addEventListener('chrome:ready',tryMount);
+
+  window.jakPhone = { COUNTRIES, splitE164, phoneReadOnlyHTML };
 })();

@@ -313,6 +313,34 @@ html[dir="rtl"] .fab-dons{right:auto;left:18px}
 .authprev{max-width:120px;border-radius:12px;border:2px solid var(--gold);margin:6px 0}
 @media (prefers-reduced-motion: reduce){ .authov{backdrop-filter:none} }
 
+/* Champ téléphone international (modal OTP) */
+.tel-row{display:flex;gap:8px;align-items:stretch;margin:4px 0 10px}
+.cc-wrap{position:relative;flex:none}
+.cc-btn{display:inline-flex;align-items:center;gap:6px;min-block-size:44px;
+  padding:0 10px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:12px;color:var(--ink);font-family:'IBM Plex Mono',monospace;
+  font-size:13px;cursor:pointer}
+.cc-btn .flag{width:20px;height:14px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.cc-btn .chev{color:var(--muted);font-size:10px}
+.cc-num{flex:1;min-inline-size:0;min-block-size:44px}
+.cc-list{position:absolute;inset-inline-start:0;inset-block-start:calc(100% + 4px);
+  z-index:5;max-height:260px;overflow:auto;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:6px;min-inline-size:220px;
+  box-shadow:0 18px 40px -16px rgba(0,0,0,.7)}
+.cc-list[hidden]{display:none}
+.cc-opt{display:flex;align-items:center;gap:8px;inline-size:100%;min-block-size:44px;
+  padding:6px 8px;background:transparent;border:none;border-radius:8px;cursor:pointer;
+  color:var(--ink);font-size:14px;text-align:start}
+.cc-opt:hover,.cc-opt.on{background:var(--panel-2)}
+.cc-opt .flag{width:20px;height:14px;border-radius:2px;flex:none}
+.cc-opt .code{margin-inline-start:auto;font-family:'IBM Plex Mono',monospace;
+  font-size:12px;color:var(--muted)}
+/* Lecture seule (éditeur) */
+.cc-ro{display:inline-flex;align-items:center;gap:8px;padding:12px;border-radius:12px;
+  border:1px dashed var(--line);background:var(--panel-2);color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;font-size:15px}
+.cc-ro .flag{width:22px;height:15px;border-radius:2px}
+
 /* ============ CHANTIER 2 — PAGE DE DONS ============ */
 /* Formulaire de don — réutilise .panel / .cta / .authinp */
 .don-form{max-width:520px;margin:0 auto}
