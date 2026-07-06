@@ -37,6 +37,12 @@ eq(otp_normalize_phone('+221700000000', $cfg), '+221700000000', 'E.164 préserv�
 eq(otp_normalize_phone('+33600000000', $cfg), '+33600000000', 'format FR préservé');
 eq(otp_normalize_phone('123', $cfg), null, 'trop court → null');
 
+// Concaténé indicatif+national (ce que le client envoie) → E.164.
+eq(otp_normalize_phone('221700000000', $cfg), '+221700000000', 'concat SN → +221…');
+eq(otp_normalize_phone('2250700000000', $cfg), '+2250700000000', 'concat CI → +225…');
+eq(otp_normalize_phone('2207000000', $cfg), '+2207000000', 'concat GM (10 chiffres) → +220…');
+eq(otp_normalize_phone('33700000000', $cfg), '+33700000000', 'concat FR → +33…');
+
 // otp_can_send : cooldown basé sur last_send.
 ok(otp_can_send([], 1000, $cfg) === true, 'envoi permis sans last_send');
 $sess = ['last_send' => 1000];

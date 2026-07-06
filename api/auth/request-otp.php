@@ -13,7 +13,9 @@
 //      envoyé) → verify-otp se comporte à l'identique (pas d'oracle d'énumération).
 //    - Throttle fichier (anti-abus) inchangé.
 //
-//  Téléphone : normalisé en E.164 ('+221...') avant lookup/otp_creer.
+//  Téléphone : normalisé en E.164 ('+<indicatif><national>') avant lookup/otp_creer
+//  — otp_normalize_phone gère le legacy 9 chiffres (→ +221) et tout indicatif
+//  concaténé (10-15 chiffres) envoyé par le client.
 // =============================================================================
 require_once __DIR__.'/../lib/bootstrap.php';
 require_once __DIR__.'/../lib/store.php';
@@ -58,48 +60,46 @@ if ($role === 'admin') {
     json_out(['success'=>false,'message'=>'Envoi du code impossible pour le moment. Réessayez.'], 500);
   }
   $_SESSION['otp'] = ['otp_id'=>$otpId, 'last_send'=>$now];
-  $res = wa_send_otp($phone, $code, $cfg);
+  $res = wa_send_otp($phoneIntl, $code, $cfg);
   if (!$res['ok']) json_out(['success'=>false,'message'=>'Envoi du code impossible pour le moment. Réessayez.'], 502);
   json_out(['success'=>true,'message'=>'Code envoyé au numéro administrateur.','cooldown'=>$cfg['otp_resend']]);
 }
 
 // Rôle membre — anti-énumération : réponse, statut ET temps de réponse identiques
 // que le numéro corresponde ou non à une fiche.
-$phone9 = preg_replace('/\D/', '', (string)($in['telephone'] ?? ''));
-if (strlen($phone9) !== 9) {
+// Le client concatène indicatif+national (ex. "221771234567") ; on normalise en
+// E.164. Legacy : 9 chiffres seuls → +221 (via otp_normalize_phone).
+$raw       = preg_replace('/\D/', '', (string)($in['telephone'] ?? ''));
+$phoneIntl = otp_normalize_phone($raw, $cfg);
+if ($phoneIntl === null) {
   json_out(['success'=>true,'message'=>$GENERIC,'cooldown'=>$cfg['otp_resend']]);
 }
-$th = throttle_check_and_touch($phone9, $now, $cfg);
+// Clé de throttle = chiffres de l'E.164 (numéro complet, pas seulement national).
+$throttleKey = preg_replace('/\D/', '', $phoneIntl);
+$th = throttle_check_and_touch($throttleKey, $now, $cfg);
 if (!$th['allowed']) {
   json_out(['success'=>false,'message'=>'Veuillez patienter avant un nouvel envoi.','cooldown'=>$cfg['otp_resend']], 429);
 }
 
-// Lookup membre en base (E.164). En cas d'échec DB, on reste silencieux
-// (anti-énumération) en posant quand même un défi leurre sans personne_id.
-$phoneIntl = otp_normalize_phone($phone9, $cfg);
+// Lookup membre en base (E.164). Échec DB → silencieux (leurre sans personne_id).
 $m = null;
 $personneId = null;
-if ($phoneIntl !== null) {
-  try { $m = member_find_by_phone($cfg, $phoneIntl); } catch (Throwable $e) { $m = null; }
-  $personneId = ($m && isset($m['id'])) ? (int)$m['id'] : null;
-}
+try { $m = member_find_by_phone($cfg, $phoneIntl); } catch (Throwable $e) { $m = null; }
+$personneId = ($m && isset($m['id'])) ? (int)$m['id'] : null;
 
 $code = otp_generate();
 $hash = otp_hash($code, $cfg);
-// Challenge posé MÊME sans membre (leurre non envoyé) : verify-otp se comporte
-// à l'identique (jamais 'none' pour un inconnu) → pas d'oracle d'énumération au verify.
 try {
   $otpId = db_call_function('otp_creer', ['membre', $phoneIntl, $personneId, $hash, (int)($cfg['otp_ttl'] ?? 300)], $cfg);
 } catch (Throwable $e) {
   error_log('[jak-otp] otp_creer membre échec : '.$e->getMessage());
-  // On reste générique (anti-énumération) même en cas d'erreur DB.
   $otpId = null;
 }
 $_SESSION['otp'] = ['otp_id'=>$otpId, 'last_send'=>$now];
 
 respond_then_continue(['success'=>true,'message'=>$GENERIC,'cooldown'=>$cfg['otp_resend']]);
 if ($m && $otpId !== null) {
-  $res = wa_send_otp($phone9, $code, $cfg);
+  $res = wa_send_otp($phoneIntl, $code, $cfg);
   if (!$res['ok']) { error_log('[jak-otp] echec envoi WhatsApp membre'); }
 }
 exit;

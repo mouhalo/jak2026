@@ -1,6 +1,4 @@
 <?php
-function wa_e164(string $phone9): string { return '+221'.$phone9; }
-
 /**
  * Résout le bundle CA pour la vérif SSL cURL (cf. db.php / config.php).
  * On ne DÉSACTIVE jamais la vérif — on pointe juste vers un CA valide.
@@ -39,11 +37,11 @@ function _wa_curl(string $url, array $body, array $cfg): array {
   return ['status'=>$status, 'json'=>is_array($json)?$json:[]];
 }
 
-function wa_send_otp(string $phone9, string $code, array $cfg, ?callable $transport=null): array {
+function wa_send_otp(string $phoneE164, string $code, array $cfg, ?callable $transport=null): array {
   // Transport par défaut : closure qui capture $cfg pour le résolveur CA bundle.
   // (Permet aussi l'injection d'un mock pour les tests, en gardant $cfg.)
   $transport = $transport ?? fn($url, $body) => _wa_curl($url, $body, $cfg);
-  $body = ['telephone'=>wa_e164($phone9), 'code'=>$code, 'langue'=>$cfg['langue'] ?? 'fr'];
+  $body = ['telephone'=>$phoneE164, 'code'=>$code, 'langue'=>$cfg['langue'] ?? 'fr'];
   try {
     $res = $transport($cfg['whatsapp_url'], $body);
   } catch (\Throwable $e) {
