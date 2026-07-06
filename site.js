@@ -14,7 +14,7 @@ const I18N={
    protocole_txt:"Entrées dédiées cartes Verte (hommes, porte Est) et Orange (femmes, porte Ouest) · Placement au 1er rang face au podium · Appel nominatif pour les discours, escorte vers le podium, un orateur à la fois.",
    footer:"Organisé par Jeunesse Al Khaïry · CICES, Dakar",
    acces_membre:"Accès membre", deconnexion:"Se déconnecter",
-   otp_envoi:"Recevez un code par WhatsApp", otp_tel:"Votre téléphone (9 chiffres)",
+   otp_envoi:"Recevez un code par WhatsApp", otp_tel:"Votre numéro de téléphone",
    otp_code:"Code à 6 chiffres", otp_valider:"Valider", enregistrer:"Enregistrer",
    ma_fiche:"Ma fiche", saved_ok:"Fiche enregistrée ✓",
    /* Page de dons */
