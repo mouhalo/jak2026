@@ -29,12 +29,25 @@ require_once __DIR__.'/../lib/bootstrap.php';
 require_once __DIR__.'/../lib/db.php';
 require_once __DIR__.'/../lib/payservices.php';
 require_once __DIR__.'/../lib/dons.php';
+require_once __DIR__.'/../lib/auth.php';
+
+$cfg = app_boot();   // démarre la session (nécessaire au contrôle de rôle ci-dessous)
 
 // --- Détection du mode ----------------------------------------------------
-// CLI ou ?force → cron (illimité). Sinon HTTP → throttle par fichier.
-$isCron = (php_sapi_name() === 'cli') || isset($_GET['force']);
-
-$cfg = app_boot();
+// CLI (cron) → illimité. HTTP → throttlé par défaut. Le bypass ?force est réservé
+// à un ADMIN AUTHENTIFIÉ (MAJ-002 : ?force était un bypass de throttle ouvert à
+// n'importe quel anonyme → martèlement de pay_services + sql_jsonpro = abus/DoS).
+$isCron = (php_sapi_name() === 'cli');
+if (!$isCron && isset($_GET['force'])) {
+    $a = auth_current($cfg);
+    if ($a && ($a['role'] ?? '') === 'admin') {
+        $isCron = true;   // admin authentifié : bypass du throttle autorisé
+    } else {
+        // Non-admin : on IGNORE ?force et on reste en mode throttlé (pas d'erreur,
+        // pas de fuite d'info — la page publique appelle reconcile sans ?force).
+        error_log('[jak-pay] reconcile ?force refusé (non-admin) — throttle appliqué');
+    }
+}
 
 // En mode HTTP, on throttle via un fichier timestamp. En CLI on passe.
 if (!$isCron) {

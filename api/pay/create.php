@@ -32,6 +32,7 @@ require_once __DIR__.'/../lib/db.php';
 require_once __DIR__.'/../lib/payservices.php';
 require_once __DIR__.'/../lib/otp.php';     // otp_normalize_phone()
 require_once __DIR__.'/../lib/dons.php';
+require_once __DIR__.'/../lib/ratelimit.php';
 
 $cfg = app_boot();
 $in   = read_body();
@@ -70,6 +71,27 @@ if ($nom === '') {
     $nom = null;
 } elseif (mb_strlen($nom) > 120) {
     $nom = mb_substr($nom, 0, 120);
+}
+
+// --- 1bis. Rate-limiting anti-abus (MAJ-003) -----------------------------
+// Endpoint public/anonyme : on borne la création de dons par IP ET par téléphone
+// pour éviter la création en masse de dons + de transactions pay_services. Placé
+// APRÈS la validation (entrées valides, $tel9 connu) et AVANT le travail coûteux
+// (don_creer + appel opérateur). Fail-open borné si le store est indisponible.
+$ip = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+$rl = rate_limit_check(
+    $cfg['don_rate_path'] ?? (__DIR__.'/../state/dons-throttle.json'),
+    [
+        ['key'=>'ip:'.$ip,    'max'=>(int)($cfg['don_rate_ip_hour']  ?? 30), 'window'=>3600, 'cooldown'=>0],
+        ['key'=>'tel:'.$tel9, 'max'=>(int)($cfg['don_rate_tel_hour'] ?? 10), 'window'=>3600, 'cooldown'=>0],
+    ],
+    time()
+);
+if (!$rl['allowed']) {
+    error_log('[jak-pay] create rate-limit ('.$rl['reason'].') ip='.$ip);
+    json_out(['success'=>false,
+              'message'=>'Trop de demandes en peu de temps. Patientez un moment avant de réessayer.'],
+             429);
 }
 
 // --- 2. Création du don en_attente ---------------------------------------
