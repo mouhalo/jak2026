@@ -84,7 +84,11 @@
     list.querySelectorAll('.cc-opt').forEach(o=>o.addEventListener('click',()=>{
       setCur(byIso(o.dataset.iso)); close(); num.focus(); }));
     num.addEventListener('input',()=>{ num.value=num.value.replace(/\D/g,'').slice(0,cur.len); });
-    document.addEventListener('click',e=>{ if(!wrap.contains(e.target)) close(); });
+    function onDocClick(e){
+      if(!document.contains(wrap)){ document.removeEventListener('click',onDocClick); return; }
+      if(!wrap.contains(e.target)) close();
+    }
+    document.addEventListener('click',onDocClick);
     wrap.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
     return {
       el: wrap,
