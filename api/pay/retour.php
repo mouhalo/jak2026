@@ -35,67 +35,88 @@ require_once __DIR__.'/../lib/dons.php';
 $cfg = app_boot();
 header('Content-Type: text/html; charset=utf-8');
 
-$uuid         = isset($_GET['uuid']) ? (string)$_GET['uuid'] : null;
-$statut_param = isset($_GET['statut']) ? (string)$_GET['statut'] : null;
+// Identifiants d'arrivée. pay_services redirige vers purl_success (avec ?ref=)
+// ou purl_fail (?statut=echec&ref=...). Certains opérateurs ajoutent aussi leur
+// propre ?uuid= : on l'accepte s'il est présent, sinon on résout par la référence
+// (connue AVANT l'appel pay_services, donc toujours embarquée dans l'URL de retour).
+$uuid         = isset($_GET['uuid'])   ? trim((string)$_GET['uuid'])   : '';
+$ref          = isset($_GET['ref'])    ? trim((string)$_GET['ref'])    : '';
+$statut_param = isset($_GET['statut']) ? (string)$_GET['statut']       : null;
 $base         = rtrim((string)$cfg['purl_base'], '/');
 
 // --- Détermination de l'état à afficher -----------------------------------
-// Par défaut : échec (arrivée via purl_fail sans uuid, ou uuid introuvable).
-$etat = 'echoue';   // 'confirme' | 'echoue' | 'inconnu'
+// Défaut NEUTRE : on n'affirme JAMAIS un échec par défaut. Un redirect de succès
+// dont l'identifiant n'est pas (encore) résolvable doit afficher « en cours de
+// vérification », pas un faux « échec » (le polling status.php et reconcile.php
+// confirmeront). On ne bascule en 'echoue' que sur un échec EXPLICITE.
+$etat = 'inconnu';   // 'confirme' | 'echoue' | 'inconnu'
 
-if ($uuid !== null && $uuid !== '') {
-    try {
+// --- Résolution du don : par uuid si fourni, sinon par référence -----------
+$row      = null;
+$pollUuid = $uuid;   // uuid à interroger côté pay_services (peut provenir de la ref)
+try {
+    if ($uuid !== '') {
         $row = don_par_uuid_query($uuid, $cfg);
-    } catch (Throwable $e) {
-        // DB injoignable : on affiche un écran neutre. Le rattrapage corrigera.
-        $row = null;
-        error_log('[jak-pay] retour don_par_uuid_query : '.$e->getMessage());
+    } elseif ($ref !== '') {
+        $row = don_par_reference_query($ref, $cfg);
+        if ($row !== null && !empty($row['uuid'])) {
+            $pollUuid = (string)$row['uuid'];
+        }
     }
+} catch (Throwable $e) {
+    // DB injoignable : écran neutre, le rattrapage corrigera.
+    $row = null;
+    error_log('[jak-pay] retour résolution don : '.$e->getMessage());
+}
 
-    if ($row !== null) {
-        $donId  = $row['id'];
-        $statut = $row['statut'];
+if ($row !== null) {
+    $donId  = $row['id'];
+    $statut = (string)$row['statut'];
 
-        // Déjà traité (status.php ou un précédent retour) → on reflète l'état.
-        if ($statut === 'confirme') {
-            $etat = 'confirme';
-        } elseif ($statut === 'echoue') {
-            $etat = 'echoue';
-        } else {
-            // Toujours en_attente : on poll pay_services (confirmation primaire).
-            try {
-                $ps = ps_payment_status($uuid, $cfg);
-                if ($ps['ok']) {
-                    $st = $ps['statut'] ?? '';
-                    if ($st === 'COMPLETED' || $st === 'SUCCESSFUL') {
-                        db_call_function('don_confirmer',
-                            [$donId, db_cast($uuid, 'uuid')], $cfg);
-                        $etat = 'confirme';
-                    } elseif ($st === 'FAILED') {
-                        db_call_function('don_echouer',
-                            [$donId, db_cast($uuid, 'uuid'), 'payment_status FAILED'],
-                            $cfg);
-                        $etat = 'echoue';
-                    } else {
-                        // PROCESSING / autre → encore en attente opérateur.
-                        $etat = 'inconnu';
-                    }
+    // Déjà traité (status.php ou un précédent retour) → on reflète l'état.
+    if ($statut === 'confirme') {
+        $etat = 'confirme';
+    } elseif ($statut === 'echoue') {
+        $etat = 'echoue';
+    } elseif ($pollUuid !== '') {
+        // Toujours en_attente : on poll pay_services (confirmation primaire).
+        try {
+            $ps = ps_payment_status($pollUuid, $cfg);
+            if ($ps['ok']) {
+                $st = strtoupper((string)($ps['statut'] ?? ''));
+                if ($st === 'COMPLETED' || $st === 'SUCCESSFUL') {
+                    db_call_function('don_confirmer',
+                        [$donId, db_cast($pollUuid, 'uuid')], $cfg);
+                    $etat = 'confirme';
+                } elseif ($st === 'FAILED' || $st === 'CANCELED') {
+                    // Statuts terminaux d'échec (cf. walletApi.js isFailureStatus).
+                    db_call_function('don_echouer',
+                        [$donId, db_cast($pollUuid, 'uuid'), 'payment_status '.$st],
+                        $cfg);
+                    $etat = 'echoue';
                 } else {
-                    // pay_services injoignable → on n'échoue pas le don pour
-                    // autant (le rattrapage reconcile.php s'en chargera).
+                    // PROCESSING / PENDING / autre → encore en attente opérateur.
                     $etat = 'inconnu';
                 }
-            } catch (Throwable $e) {
-                error_log('[jak-pay] retour poll/confirme : '.$e->getMessage());
+            } else {
+                // pay_services injoignable → on n'échoue pas le don (reconcile.php
+                // s'en chargera).
                 $etat = 'inconnu';
             }
+        } catch (Throwable $e) {
+            error_log('[jak-pay] retour poll/confirme : '.$e->getMessage());
+            $etat = 'inconnu';
         }
-    } elseif ($statut_param !== 'echec') {
-        // uuid fourni mais don introuvable : ni succès ni échec certain.
+    } else {
+        // en_attente mais aucun uuid pour poller (arrivée par ref, uuid non encore
+        // attaché) → reconcile.php rattrapera. On n'affirme rien.
         $etat = 'inconnu';
     }
+} elseif ($statut_param === 'echec') {
+    // Don introuvable MAIS redirect d'échec explicite (purl_fail) : l'opérateur
+    // nous signale un échec → on peut l'afficher. Sinon, on reste neutre.
+    $etat = 'echoue';
 }
-// Si pas d'uuid et statut=echec (purl_fail) → $etat reste 'echoue'.
 
 // --- Rendu HTML -----------------------------------------------------------
 $titre  = '';

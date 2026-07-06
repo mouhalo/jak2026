@@ -111,10 +111,11 @@ foreach ($rows as $r) {
             db_call_function('journal_ajouter',
                 ['reconciliation', 'don', $donId, db_cast($payload, 'jsonb')], $cfg);
         } catch (Throwable $e) { /* audit non critique */ }
-    } elseif ($st === 'FAILED') {
+    } elseif ($st === 'FAILED' || $st === 'CANCELED') {
+        // FAILED et CANCELED = statuts terminaux d'échec (cf. walletApi.js).
         try {
             $res = db_call_function('don_echouer',
-                [$donId, db_cast($uuid, 'uuid'), 'reconcile FAILED'], $cfg);
+                [$donId, db_cast($uuid, 'uuid'), 'reconcile '.$st], $cfg);
             if (is_array($res) && ($res['action'] ?? '') === 'echoue') {
                 $echoues++;
             }

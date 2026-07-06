@@ -89,10 +89,13 @@ if ($st === 'COMPLETED' || $st === 'SUCCESSFUL') {
         json_out(['success'=>true, 'statut'=>'en_attente', 'don_id'=>$donId], 200);
     }
 }
-if ($st === 'FAILED') {
+// FAILED et CANCELED sont deux statuts TERMINAUX d'échec (cf. walletApi.js
+// isFailureStatus). On échoue le don dans les deux cas pour que le polling
+// navigateur s'arrête proprement au lieu de tourner jusqu'au timeout.
+if ($st === 'FAILED' || $st === 'CANCELED') {
     try {
         db_call_function('don_echouer',
-            [$donId, db_cast($uuid, 'uuid'), 'payment_status FAILED'], $cfg);
+            [$donId, db_cast($uuid, 'uuid'), 'payment_status '.$st], $cfg);
         json_out(['success'=>true, 'statut'=>'echoue', 'don_id'=>$donId], 200);
     } catch (Throwable $e) {
         error_log('[jak-pay] status don_echouer : '.$e->getMessage());

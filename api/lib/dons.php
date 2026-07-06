@@ -83,16 +83,62 @@ function don_par_uuid_query(string $uuid, array $cfg): ?array {
 
 /**
  * URL de retour SUCCÈS (redirect navigateur depuis pay_services).
- * pay_services redirige vers {purl_base}/api/pay/retour.php?uuid=...
+ *
+ * On embarque la RÉFÉRENCE INTERNE (?ref=) — connue AVANT l'appel pay_services,
+ * contrairement à l'uuid qui n'est renvoyé QUE par add_payement. C'est le seul
+ * identifiant qu'on maîtrise à l'aller : il permet à retour.php de résoudre le
+ * don même si l'opérateur n'ajoute pas d'?uuid= à la redirection. Sans ça,
+ * retour.php n'a aucun moyen d'identifier le don au retour (cf. bug CRIT-001).
+ *
+ * @param array   $cfg
+ * @param ?string $ref  Référence interne du don (generate_reference()).
  */
-function purl_success(array $cfg): string {
-    return rtrim((string)$cfg['purl_base'], '/') . '/api/pay/retour.php';
+function purl_success(array $cfg, ?string $ref = null): string {
+    $url = rtrim((string)$cfg['purl_base'], '/') . '/api/pay/retour.php';
+    if ($ref !== null && $ref !== '') {
+        $url .= '?ref=' . rawurlencode($ref);
+    }
+    return $url;
 }
 
 /**
- * URL de retour ÉCHEC. On réutilise retour.php avec un paramètre statut=echec
- * pour distinguer les deux flux d'arrivée (pay_services appelle success OU fail).
+ * URL de retour ÉCHEC. On réutilise retour.php avec statut=echec (pour l'échec
+ * explicite) ET la référence (pour identifier le don côté retour.php).
+ *
+ * @param array   $cfg
+ * @param ?string $ref  Référence interne du don.
  */
-function purl_fail(array $cfg): string {
-    return rtrim((string)$cfg['purl_base'], '/') . '/api/pay/retour.php?statut=echec';
+function purl_fail(array $cfg, ?string $ref = null): string {
+    $url = rtrim((string)$cfg['purl_base'], '/') . '/api/pay/retour.php?statut=echec';
+    if ($ref !== null && $ref !== '') {
+        $url .= '&ref=' . rawurlencode($ref);
+    }
+    return $url;
+}
+
+/**
+ * Retrouve un don depuis sa référence interne (fallback de retour.php quand
+ * l'opérateur ne renvoie pas d'uuid dans la redirection).
+ *
+ * SELECT contrôlé via db_query : la référence provient du paramètre ?ref= de
+ * l'URL (donc potentiellement hostile) → on la neutralise via db_quote (quote +
+ * échappement des apostrophes), jamais interpolée brute.
+ *
+ * @param string $ref  Référence interne (ex : 'JAK...', ≤ 11 car).
+ * @param array  $cfg
+ * @return array|null  Ligne {id, uuid, statut, reference_interne} ou null.
+ */
+function don_par_reference_query(string $ref, array $cfg): ?array {
+    $sql = "SELECT id, uuid, statut, reference_interne FROM don "
+         . "WHERE reference_interne = " . db_quote($ref)
+         . " ORDER BY id DESC LIMIT 1";
+    $rows = db_query($sql, $cfg);
+    if (!$rows) return null;
+    $r = $rows[0];
+    return [
+        'id'                => isset($r['id']) ? (int)$r['id'] : null,
+        'uuid'              => $r['uuid'] ?? null,
+        'statut'            => (string)($r['statut'] ?? ''),
+        'reference_interne' => $r['reference_interne'] ?? null,
+    ];
 }

@@ -134,6 +134,61 @@ footer.site img{height:30px;border-radius:6px;background:#fff;padding:2px;margin
   transition:.3s;box-shadow:0 10px 30px -8px rgba(212,168,58,.6)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
+/* ============ MODAL AUTO-FERMENTANT (validation don) ============ */
+/* Overlay semi-transparent + carte centrée. S'affiche, puis se ferme
+   automatiquement après ~3.5 s, ou au clic sur le bouton/l'overlay. */
+.mt-overlay{position:fixed;inset:0;z-index:140;background:rgba(20,16,8,.55);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;padding:20px}
+.mt-overlay.on{opacity:1;pointer-events:auto}
+.mt-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:26px 24px 22px;max-width:min(88vw,380px);text-align:center;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
+  transform:scale(.92);transition:transform .25s ease}
+.mt-overlay.on .mt-card{transform:scale(1)}
+.mt-card .mt-ic{font-size:38px;line-height:1;margin-bottom:10px}
+.mt-card .mt-titre{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;font-size:20px;color:var(--ink);
+  margin:0 0 6px}
+.mt-card .mt-txt{font-size:14px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+.mt-card .mt-btn{background:var(--gold);color:#1a1408;border:none;border-radius:999px;
+  padding:10px 22px;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:14px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
+  transition:transform .15s ease}
+.mt-card .mt-btn:hover{transform:translateY(-1px)}
+.mt-bar{height:3px;background:var(--panel-2);border-radius:2px;margin-top:14px;overflow:hidden}
+.mt-bar::after{content:'';display:block;height:100%;width:100%;
+  background:var(--gold);transform-origin:left;animation:mtBar 3.5s linear forwards}
+@keyframes mtBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (prefers-reduced-motion: reduce){
+  .mt-overlay,.mt-card,.mt-card .mt-btn{transition:none}
+  .mt-bar::after{animation:none}
+}
+
+/* ============ BOUTON FLOTTANT "SOUTENIR" ============ */
+/* Présent sur toutes les pages sauf dons.html. Fixe en bas à droite,
+   au-dessus du toast (z-index inférieur à authov/lbx). Texte doré + cœur. */
+.fab-dons{position:fixed;right:18px;bottom:18px;z-index:115;
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--gold);color:#1a1408;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+  text-decoration:none;border-radius:999px;padding:13px 20px;
+  box-shadow:0 12px 32px -10px rgba(212,168,58,.7);
+  transition:transform .18s ease, box-shadow .18s ease}
+.fab-dons:hover{transform:translateY(-2px);box-shadow:0 16px 38px -10px rgba(212,168,58,.85)}
+.fab-dons:active{transform:translateY(0)}
+.fab-dons .fab-heart{color:var(--red);font-size:15px;line-height:1}
+/* RTL : le bouton passe à gauche en arabe (cohérent avec la lecture). */
+html[dir="rtl"] .fab-dons{right:auto;left:18px}
+@media (max-width:480px){
+  .fab-dons{right:12px;bottom:14px;padding:11px 16px;font-size:14px}
+}
+@media (prefers-reduced-motion: reduce){
+  .fab-dons{transition:none}
+  .fab-dons:hover{transform:none}
+}
+
 /* ============ CARROUSEL PARTAGÉ ============ */
 .jcaro-stage{position:relative;padding:8px 0 4px;text-align:center;overflow:hidden}
 .jcaro{position:relative;height:min(58vw,400px);margin:0 auto;max-width:1100px}
@@ -258,9 +313,39 @@ footer.site img{height:30px;border-radius:6px;background:#fff;padding:2px;margin
 .don-form .canal-row input:checked + span,
 .don-form .canal-row label:has(input:checked){border-color:var(--gold);background:rgba(212,164,66,.12)}
 .don-form .canal-row img{width:20px;height:20px}
+/* Indication dynamique du canal choisi (se met à jour à chaque clic radio). */
+.don-form .canal-indic{margin-top:8px;font-size:13px;color:var(--muted);
+  display:flex;align-items:center;gap:6px;justify-content:center}
+.don-form .canal-indic .ci-ic{width:15px;height:15px;display:inline-flex}
+.don-form .canal-indic .ci-ic img{width:15px;height:15px}
+.don-form .canal-indic .ci-nom{font-weight:600;color:var(--ink)}
 .don-msg{margin-top:10px;padding:10px 14px;border-radius:10px;font-size:14px;text-align:center}
 .don-msg.ok{background:rgba(46,125,50,.12);color:var(--green);border:1px solid var(--green)}
 .don-msg.err{background:rgba(198,40,40,.12);color:var(--red);border:1px solid var(--red)}
+
+/* Zone de paiement affichée après création du don : QR + boutons.
+   Bloc inline sous le formulaire, styled comme un .panel dédié. */
+.pay-zone{margin-top:16px;padding:20px;border-radius:16px;border:1px solid var(--gold);
+  background:var(--panel);display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:center;gap:20px;animation:payIn .3s ease}
+@keyframes payIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pay-zone .pay-qr{flex:0 0 auto;text-align:center}
+.pay-zone .pay-qr img{width:min(46vw,210px);max-width:210px;border-radius:12px;
+  border:1px solid var(--line);background:#fff;padding:8px}
+.pay-zone .pay-acts{flex:1 1 220px;display:flex;flex-direction:column;gap:8px;
+  min-width:220px;text-align:center}
+.pay-zone .pay-acts .pay-hint{font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.pay-zone .pay-acts .cta{width:100%}
+.pay-zone .pay-acts .cta.ghost{background:transparent;color:var(--ink)}
+.pay-zone .pay-statut{flex-basis:100%;text-align:center;font-size:14px;padding:8px;
+  border-radius:8px;margin-top:4px}
+.pay-zone .pay-statut.wait{color:var(--muted)}
+.pay-zone .pay-statut.ok{color:var(--green);background:rgba(46,125,50,.1)}
+@media (max-width:560px){
+  .pay-zone{flex-direction:column}
+  .pay-zone .pay-acts{min-width:0;width:100%}
+}
 
 /* Carrousel des soutiens — réutilise .jcaro-stage/.jslide mais en cartes texte */
 .soutiens-caro{position:relative;padding:10px 0 4px;text-align:center;overflow:hidden;

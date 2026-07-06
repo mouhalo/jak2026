@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Soutenir la visite du Cheikh — Jeunesse Al Khaïry 2026</title>
-<meta name="description" content="Soutenez l'organisation de la visite de Cheikh Ould Khaïry (CICES, Dakar, 16-18 juillet 2026). Contribution par Wave ou Orange Money.">
+<title>Soutenez la Jeunesse Al Khaïry — Visite du Cheikh 2026</title>
+<meta name="description" content="Soutenez la Jeunesse Al Khaïry (JAK). Votre contribution par Wave ou Orange Money aide à organiser la visite de Cheikh Ould Khaïry (CICES, Dakar, 16-18 juillet 2026).">
 <link rel="canonical" href="https://jak.sn/dons.html">
 <link rel="icon" href="/logo.png" type="image/png">
 <link rel="apple-touch-icon" href="/logo.png">
@@ -43,16 +43,17 @@
         <div class="fld">
           <label for="fMontant" id="lblMontant"></label>
           <input id="fMontant" name="montant" type="number" inputmode="numeric"
-                 min="100" max="2000000" step="100" value="5000" required>
+                 min="1000" max="2000000" step="100" value="1000" required>
         </div>
         <div class="fld">
           <span id="lblCanal"></span>
-          <div class="canal-row">
+          <div class="canal-row" id="canalRow">
             <label><input type="radio" name="canal" value="WAVE">
               <img src="icone/wave.png" alt=""><span>Wave</span></label>
             <label><input type="radio" name="canal" value="OM" checked>
               <img src="icone/om.png" alt=""><span>Orange Money</span></label>
           </div>
+          <p class="canal-indic" id="canalIndic"></p>
         </div>
         <div class="fld">
           <label for="fTel" id="lblTel"></label>

@@ -96,8 +96,8 @@ $params = [
     'pReference'   => $ref,
     'pClientTel'   => $tel9,
     'pMontant'     => $montant,
-    'purl_success' => purl_success($cfg),
-    'purl_fail'    => purl_fail($cfg),
+    'purl_success' => purl_success($cfg, $ref),
+    'purl_fail'    => purl_fail($cfg, $ref),
 ];
 $ps = ps_add_payement($params, $cfg);
 
