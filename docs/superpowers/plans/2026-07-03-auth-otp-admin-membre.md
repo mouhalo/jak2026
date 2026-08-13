@@ -12,7 +12,7 @@
 
 - **Canal OTP : uniquement WhatsApp** (`https://api.icelabsoft.com/whatsapp_service/api/send_otp`), corps `{telephone, code, langue}`, téléphone **E.164 `+221`+9 chiffres**, code **6 chiffres**, `langue:"fr"`. Pas de repli SMS/e-mail.
 - **Pas de base de données** — le datastore est `data.json` ; `data.js` est un artefact régénéré (`window.SITE_DATA=<json>;`).
-- **Numéro admin** : `REDACTED` (9 chiffres), dans `config.php` uniquement, jamais exposé au client.
+- **Numéro admin** : `XXXXXXXXX` (9 chiffres), dans `config.php` uniquement, jamais exposé au client.
 - **OTP** : haché (HMAC-SHA256 + secret), expiration **300 s**, **max 5 tentatives**, **cooldown 60 s**, 1 défi actif par session.
 - **Sessions** : cookie `httponly=1`, `samesite=Lax`, `secure=1` **seulement en HTTPS** (désactivé en local http) ; `session_regenerate_id(true)` à la connexion.
 - **Cloisonnement** : un membre ne modifie que la fiche de son `member_id` de session ; `id` immuable ; `telephone` = 9 chiffres, unique.
@@ -82,7 +82,7 @@ Expected: une chaîne hexadécimale de 64 caractères — la copier pour l'étap
 <?php
 // Secrets & réglages — NE PAS committer (voir .gitignore).
 return [
-  'admin_phone'  => 'REDACTED',                 // 9 chiffres → +221REDACTED
+  'admin_phone'  => 'XXXXXXXXX',                 // 9 chiffres → +221XXXXXXXXX
   'whatsapp_url' => 'https://api.icelabsoft.com/whatsapp_service/api/send_otp',
   'otp_secret'   => 'COLLER_LE_SECRET_HEX_ICI',   // 64 hex de l'étape 2
   'otp_ttl'      => 300,   // s
@@ -128,7 +128,7 @@ Run:
 ```bash
 C:/php/php.exe -r "$c=require 'api/lib/config.php'; echo $c['admin_phone'],'|',strlen($c['otp_secret']);"
 ```
-Expected: `REDACTED|64`
+Expected: `XXXXXXXXX|64`
 
 - [ ] **Step 8: Commit**
 
@@ -434,13 +434,13 @@ eq($r['member_id'], 'm-a', 'member_id renvoyé');
 ok(empty($sess), 'défi effacé après succès');
 
 // Expiration
-$sess=[]; otp_set_challenge($sess,'admin',null,'REDACTED','654321',2000,$cfg);
+$sess=[]; otp_set_challenge($sess,'admin',null,'XXXXXXXXX','654321',2000,$cfg);
 $r = otp_verify($sess, '654321', 2000+301, $cfg);
 ok($r['ok']===false && $r['reason']==='expired', 'code expiré refusé');
 ok(empty($sess), 'défi expiré effacé');
 
 // Blocage après max tentatives
-$sess=[]; otp_set_challenge($sess,'admin',null,'REDACTED','654321',3000,$cfg);
+$sess=[]; otp_set_challenge($sess,'admin',null,'XXXXXXXXX','654321',3000,$cfg);
 for($i=0;$i<5;$i++){ $r=otp_verify($sess,'000000',3001,$cfg); }
 ok($r['reason']==='locked' || empty($sess), 'verrouillé après 5 essais');
 $r = otp_verify($sess,'654321',3002,$cfg);
@@ -531,20 +531,20 @@ require __DIR__.'/_assert.php';
 require __DIR__.'/../lib/whatsapp.php';
 $cfg = ['whatsapp_url'=>'https://example/send_otp','langue'=>'fr'];
 
-eq(wa_e164('REDACTED'), '+221REDACTED', 'format E.164 +221');
+eq(wa_e164('XXXXXXXXX'), '+221XXXXXXXXX', 'format E.164 +221');
 
 // Transport qui capture le corps et simule un succès
 $captured = null;
 $t = function($url,$body) use (&$captured){ $captured=['url'=>$url,'body'=>$body]; return ['status'=>200,'json'=>['success'=>true,'message'=>'ok','message_id'=>'abc']]; };
-$r = wa_send_otp('REDACTED','123456',$cfg,$t);
+$r = wa_send_otp('XXXXXXXXX','123456',$cfg,$t);
 ok($r['ok']===true, 'succès WhatsApp');
-eq($captured['body']['telephone'], '+221REDACTED', 'telephone E.164 envoyé');
+eq($captured['body']['telephone'], '+221XXXXXXXXX', 'telephone E.164 envoyé');
 eq($captured['body']['code'], '123456', 'code envoyé');
 eq($captured['body']['langue'], 'fr', 'langue fr envoyée');
 
 // Échec métier
 $t2 = function($url,$body){ return ['status'=>200,'json'=>['success'=>false,'message'=>'KO','error_code'=>'META_RATE_LIMIT']]; };
-$r = wa_send_otp('REDACTED','123456',$cfg,$t2);
+$r = wa_send_otp('XXXXXXXXX','123456',$cfg,$t2);
 ok($r['ok']===false && $r['error_code']==='META_RATE_LIMIT', 'échec métier remonté');
 
 done();
@@ -829,7 +829,7 @@ Run (nouvelle console) :
 ```bash
 curl -s -c cj.txt -X POST http://localhost:3000/api/auth/request-otp.php -H "Content-Type: application/json" -d '{"role":"admin"}'
 ```
-Expected: `{"success":true,...}` et un **code WhatsApp reçu sur REDACTED**. Puis :
+Expected: `{"success":true,...}` et un **code WhatsApp reçu sur XXXXXXXXX**. Puis :
 ```bash
 curl -s -b cj.txt -X POST http://localhost:3000/api/auth/verify-otp.php -H "Content-Type: application/json" -d '{"code":"LE_CODE_RECU"}'
 ```
@@ -940,12 +940,12 @@ Expected: `No syntax errors detected`.
 
 - [ ] **Step 3: Test manuel de bout en bout (cloisonnement)**
 
-Prérequis : dans `data.json`, donner temporairement à un membre le téléphone `REDACTED` (pour recevoir l'OTP sur votre numéro de test), relancer si besoin. Serveur : `C:/php/php.exe -S localhost:3000`.
+Prérequis : dans `data.json`, donner temporairement à un membre le téléphone `XXXXXXXXX` (pour recevoir l'OTP sur votre numéro de test), relancer si besoin. Serveur : `C:/php/php.exe -S localhost:3000`.
 ```bash
-curl -s -c cj.txt -X POST http://localhost:3000/api/auth/request-otp.php -H "Content-Type: application/json" -d '{"role":"membre","telephone":"REDACTED"}'
+curl -s -c cj.txt -X POST http://localhost:3000/api/auth/request-otp.php -H "Content-Type: application/json" -d '{"role":"membre","telephone":"XXXXXXXXX"}'
 # saisir le code reçu :
 curl -s -b cj.txt -X POST http://localhost:3000/api/auth/verify-otp.php -H "Content-Type: application/json" -d '{"code":"CODE"}'
-curl -s -b cj.txt -X POST http://localhost:3000/api/member/save-fiche.php -H "Content-Type: application/json" -d '{"nom_complet":"Test Membre","adresse":"Dakar","biographie":"Bio test","telephone":"REDACTED"}'
+curl -s -b cj.txt -X POST http://localhost:3000/api/member/save-fiche.php -H "Content-Type: application/json" -d '{"nom_complet":"Test Membre","adresse":"Dakar","biographie":"Bio test","telephone":"XXXXXXXXX"}'
 ```
 Expected: dernier appel `{"success":true,"member":{..."nom_complet":"Test Membre"...}}` ; vérifier que `data.js` a été régénéré (`grep "Test Membre" data.js`).
 
@@ -1248,7 +1248,7 @@ Dans `index.html`, `dignitaires.html`, `jak.html`, `galerie.html`, ajouter aprè
 
 - [ ] **Step 5: Test manuel bout en bout (membre)**
 
-Serveur : `C:/php/php.exe -S localhost:3000`. Sur `http://localhost:3000/index.html`, cliquer « 👤 Accès membre » → saisir le téléphone d'un membre de test (celui pointant vers `REDACTED`) → recevoir l'OTP → saisir → l'éditeur s'ouvre prérempli → modifier la bio → Enregistrer → message succès. Recharger la page publique et confirmer que la modification apparaît (via `data.js` régénéré).
+Serveur : `C:/php/php.exe -S localhost:3000`. Sur `http://localhost:3000/index.html`, cliquer « 👤 Accès membre » → saisir le téléphone d'un membre de test (celui pointant vers `XXXXXXXXX`) → recevoir l'OTP → saisir → l'éditeur s'ouvre prérempli → modifier la bio → Enregistrer → message succès. Recharger la page publique et confirmer que la modification apparaît (via `data.js` régénéré).
 
 - [ ] **Step 6: Commit**
 
@@ -1299,7 +1299,7 @@ curl -s https://jak.sn/api/session.php                                   # {"aut
 ```
 Expected: `admin.html`→403, `admin.php`→200, `session.php`→JSON non authentifié.
 
-- [ ] **Step 6: Test de bout en bout en production** (admin + un membre réel), puis **retirer le téléphone de test** `REDACTED` de la fiche membre si utilisé.
+- [ ] **Step 6: Test de bout en bout en production** (admin + un membre réel), puis **retirer le téléphone de test** `XXXXXXXXX` de la fiche membre si utilisé.
 
 - [ ] **Step 7: Commit final**
 

@@ -86,7 +86,7 @@ Copie pure-JSON de `window.SITE_DATA` (settings/cheikh/dignitaires/jak/galerie).
 ### 5.3 `lib/config.php` (secrets, hors dépôt public via .gitignore)
 ```php
 return [
-  'admin_phone'   => 'REDACTED',   // 9 chiffres (confirmé) → envoi vers +221REDACTED
+  'admin_phone'   => 'XXXXXXXXX',   // 9 chiffres (confirmé) → envoi vers +221XXXXXXXXX
   'whatsapp_url'  => 'https://api.icelabsoft.com/whatsapp_service/api/send_otp',
   'otp_secret'    => '<chaîne aléatoire 32+ octets>',  // HMAC des codes/tokens
   'otp_ttl'       => 300,     // 5 min
@@ -157,7 +157,7 @@ Toutes les réponses sont JSON `{success:boolean, message:string, …}`.
 - **Style** : login/éditeur réutilisent `.panel`, `.cta`, `.toast`, modale style langues/lightbox ; i18n via `I18N` (clés à ajouter) ; propriétés logiques (RTL) ; cibles ≥ 44 px ; `prefers-reduced-motion`.
 
 ## 11. Points ouverts / à confirmer
-1. **Numéro admin** : confirmé `REDACTED` (9 chiffres) → OTP envoyé vers `+221REDACTED`. Renseigné dans `config.php`.
+1. **Numéro admin** : confirmé `XXXXXXXXX` (9 chiffres) → OTP envoyé vers `+221XXXXXXXXX`. Renseigné dans `config.php`.
 2. **Test local** : PHP **8.3.32 confirmé installé** (`C:\php\php.exe`, extensions `curl/json/session/openssl/mbstring` présentes) → serveur local via `C:\php\php.exe -S localhost:3000`. Les tests bout-en-bout consomment le quota WhatsApp (envois réels) — prévoir un mode test limité.
 
 ## 12. Tests
